@@ -50,7 +50,7 @@ services:
       - MYSQL_USER=pwa_user
       - MYSQL_PASSWORD=pwa_pass
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
