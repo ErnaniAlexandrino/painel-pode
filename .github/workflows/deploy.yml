@@ -37,7 +37,7 @@ jobs:
             # -d: roda em modo detached (segundo plano)
             # --pull: sempre puxa as imagens mais recentes (bom para builds)
             # --build: reconstrói as imagens locais (essencial para frontend/backend)
-            docker-compose -f docker-compose.yml up -d --build --pull
+            docker-compose -f docker-compose.yml up -d --build
             
             # 4. Limpeza (opcional, remove imagens não utilizadas)
             docker image prune -f
