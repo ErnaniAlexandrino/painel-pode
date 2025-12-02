@@ -1,0 +1,51 @@
+name: Deploy Docker Stack to Hostinger
+
+on:
+  push:
+    branches:
+      - main  # Define que a ação só roda em pushes para a branch 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # O executor que roda a ação
+
+    steps:
+      - name: ⬇️ Checkout do Código
+        uses: actions/checkout@v4
+        
+      - name: ⚙️ Configuração dos Arquivos de Ambiente (Opcional, mas Recomendado)
+        # Se você tiver arquivos .env, você pode criá-los no servidor usando os segredos do GitHub.
+        # Caso contrário, o docker-compose tentará buscar as variáveis do ambiente.
+        run: |
+          echo "Criando arquivos .env ou configurando variáveis de ambiente no servidor..."
+
+      - name: 🖥️ Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}             # IP ou Domínio do Servidor
+          username: ${{ secrets.HOSTINGER_USERNAME }}     # Seu nome de usuário SSH (pode ser o usuário FTP/cPanel)
+          key: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}   # Chave SSH privada para autenticação
+          port: ${{ secrets.HOSTINGER_PORT}}              # Porta SSH
+          script: |
+            # 1. Navega para o diretório de deploy no servidor
+            cd /caminho/do/seu/projeto/no/servidor
+            
+            # 2. Atualiza o código do repositório (Assumindo que o código já foi clonado uma vez)
+            git pull origin main
+            
+            # 3. Faz o deploy da stack Docker Compose
+            # -d: roda em modo detached (segundo plano)
+            # --pull: sempre puxa as imagens mais recentes (bom para builds)
+            # --build: reconstrói as imagens locais (essencial para frontend/backend)
+            docker compose -f docker-compose.yml up -d --build --pull
+            
+            # 4. Limpeza (opcional, remove imagens não utilizadas)
+            docker image prune -f
+            
+        env:
+          # Variáveis de ambiente que seu docker-compose.yml precisa (ex: para o MySQL)
+          # Isso é apenas um exemplo, você deve mapear todas as variáveis importantes.
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          # Exemplo para o frontend, se ele precisar:
+          CHOKIDAR_USEPOLLING: 'true'
+          # Outras variáveis...
