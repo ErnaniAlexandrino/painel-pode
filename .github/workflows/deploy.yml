@@ -28,7 +28,7 @@ jobs:
           port: ${{ secrets.HOSTINGER_PORT}}              # Porta SSH
           script: |
             # 1. Navega para o diretório de deploy no servidor
-            cd /caminho/do/seu/projeto/no/servidor
+            cd /var/www/pwa-app
             
             # 2. Atualiza o código do repositório (Assumindo que o código já foi clonado uma vez)
             git pull origin main
