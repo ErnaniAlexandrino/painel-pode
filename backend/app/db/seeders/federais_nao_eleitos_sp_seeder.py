@@ -101,9 +101,7 @@ def seed_federais_nao_eleitos_sp(force: bool = False) -> None:
             break
     
     if not data_path or not data_path.exists():
-        logger.error("Arquivo de seed não encontrado em nenhum dos caminhos tentados:")
-        for path in possible_paths:
-            logger.error("  - %s (existe: %s)", path, path.exists())
+        logger.info("Arquivo de seed não encontrado. Pulando execução do seed de federais não eleitos SP.")
         return
 
     logger.info("Arquivo CSV encontrado: %s", data_path)

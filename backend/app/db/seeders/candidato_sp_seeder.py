@@ -71,7 +71,7 @@ def _build_record(row: Dict[str, str]) -> Dict[str, str]:
 def seed_candidatos_sp(force: bool = False) -> None:
     data_path = Path(__file__).resolve().parents[3] / "data" / "candidatos_sp_2022.csv"
     if not data_path.exists():
-        logger.error("Arquivo de seed não encontrado em %s", data_path)
+        logger.info("Arquivo de seed não encontrado em %s. Pulando execução.", data_path)
         return
 
     session: Session = SessionLocal()
