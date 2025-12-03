@@ -18,6 +18,8 @@ app = FastAPI(title="PWA Backend")
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://147.79.81.117:3000",
+    "*",  # Liberado para todos temporariamente
 ]
 
 app.add_middleware(
