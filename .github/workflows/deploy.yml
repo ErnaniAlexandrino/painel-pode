@@ -29,6 +29,9 @@ jobs:
           script: |
             # 1. Navega para o diretório de deploy no servidor
             cd /var/www/pwa-app
+
+            # 1.1 Derruba a stack antiga para evitar conflitos e erro de cache corrompido
+            docker-compose -f docker-compose.yml down
             
             # 2. Atualiza o código do repositório (Assumindo que o código já foi clonado uma vez)
             git pull origin main
@@ -36,7 +39,7 @@ jobs:
             # 3. Faz o deploy da stack Docker Compose
             # -d: roda em modo detached (segundo plano)
             # --build: reconstrói as imagens locais (essencial para frontend/backend)
-            docker-compose -f docker-compose.yml up -d --build --pull --force-recreate
+            docker-compose -f docker-compose.yml up -d --build --pull
             
             # 4. Limpeza (opcional, remove imagens não utilizadas)
             docker image prune -f
