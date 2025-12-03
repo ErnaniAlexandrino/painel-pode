@@ -52,3 +52,4 @@ INSERT INTO federais_nao_eleitos_sp (uf, candidato, historico_de_votos, cargo, h
 
 
 
+

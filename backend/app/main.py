@@ -9,7 +9,6 @@ from .api.v1.api import api_router
 from .api.v1.endpoints import candidato_grid
 from .db.base import Base
 from .db.seeders.candidato_sp_seeder import seed_candidatos_sp
-from .db.seeders.federais_nao_eleitos_sp_seeder import seed_federais_nao_eleitos_sp
 from .db.session import engine
 
 logger = logging.getLogger(__name__)
@@ -54,7 +53,6 @@ def create_tables_with_retry(max_attempts: int = 10, delay: int = 3) -> None:
 def on_startup() -> None:
     create_tables_with_retry()
     seed_candidatos_sp(force=True)
-    seed_federais_nao_eleitos_sp(force=True)
 
 
 app.include_router(api_router, prefix="/api/v1")
