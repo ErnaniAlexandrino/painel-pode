@@ -12,7 +12,7 @@ class CandidatoSPRepository:
     def list_all(self, nome_candidato=None, limit: int = 10):
         query = self.db.query(CandidatoSP)
         if nome_candidato:
-            query = query.filter(CandidatoSP.candidato.ilike(f"{nome_candidato}%"))
+            query = query.filter(CandidatoSP.candidato.ilike(f"%{nome_candidato}%"))
         return (
             query.order_by(CandidatoSP.candidato)
             .limit(max(limit, 1))
