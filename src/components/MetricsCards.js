@@ -10,10 +10,10 @@ const MetricsCards = ({
 }) => {
   const missingWomen = Math.max(FEMALE_QUOTA - femaleAffiliatedCount, 0);
   const voting2022Data = [
-    { label: 'Quociente Eleitoral para Dept. Federal', value: '352.119,96' }, 
-    { label: '10% do Q.E.', value: '35.211,99' },
-    { label: '20% do Q.E.', value: '70.423,99' }, 
-    { label: '80% do Q.E.', value: '281.695,96' },
+    { label: 'Quociente Eleitoral para Dept. Federal', value: '352.120' }, 
+    { label: '10% do Q.E.', value: '35.212' },
+    { label: '20% do Q.E.', value: '70.424' }, 
+    { label: '80% do Q.E.', value: '281.696' },
     { label: 'Cláusula de Barreira', value: '000.000' }
   ];
 

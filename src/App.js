@@ -14,6 +14,9 @@ function App() {
   const [confirmedCount, setConfirmedCount] = useState(0);
   const [negotiationCount, setNegotiationCount] = useState(0);
   const [ppiCount, setPpiCount] = useState(0);
+  const [totalVotoProjMax, setTotalVotoProjMax] = useState(0);
+  const [totalVotoProjMin, setTotalVotoProjMin] = useState(0);
+  const [totalHistoricoVotos, setTotalHistoricoVotos] = useState(0);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -53,6 +56,9 @@ function App() {
           onConfirmedCountChange={setConfirmedCount}
           onNegotiationCountChange={setNegotiationCount}
           onPpiCountChange={setPpiCount}
+          onVotoProjMaxChange={setTotalVotoProjMax}
+          onVotoProjMinChange={setTotalVotoProjMin}
+          onHistoricoVotosChange={setTotalHistoricoVotos}
         />
         <div className="bottom-cards">
           {/* <div className="left-card">
@@ -62,7 +68,11 @@ function App() {
             <LeadersTableFederal />
           </div>
           <div className="right-card">
-            <ProjectionCards />
+            <ProjectionCards
+              totalVotoProjMax={totalVotoProjMax}
+              totalVotoProjMin={totalVotoProjMin}
+              totalHistoricoVotos={totalHistoricoVotos}
+            />
           </div>
         </div>
       </div>

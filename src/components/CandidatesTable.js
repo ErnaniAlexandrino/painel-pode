@@ -5,6 +5,18 @@ const API_V1_BASE_URL = process.env.REACT_APP_API_V1_BASE_URL || 'http://localho
 const AUTOCOMPLETE_MIN_CHARS = 2;
 const AUTOCOMPLETE_LIMIT = 10;
 
+// Função auxiliar para formatar números com separador de milhar
+const formatNumber = (num) => {
+  if (num === null || num === undefined) return '-';
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+};
+
+// Função auxiliar para formatar FEFC como moeda
+const formatCurrency = (num) => {
+  if (num === null || num === undefined) return '-';
+  return `R$ ${formatNumber(Math.round(num))}`;
+};
+
 const RACE_OPTIONS = ['Preta', 'Parda', 'Branca', 'Indígena', 'Amarela'];
 const stripAccents = (value) =>
   value
@@ -106,6 +118,9 @@ const CandidatesTable = ({
   onConfirmedCountChange = () => {},
   onNegotiationCountChange = () => {},
   onPpiCountChange = () => {},
+  onVotoProjMaxChange = () => {},
+  onVotoProjMinChange = () => {},
+  onHistoricoVotosChange = () => {},
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -132,7 +147,7 @@ const CandidatesTable = ({
 
     const totals = candidates.reduce(
       (acc, candidate) => {
-        if (!candidate?.id || candidate.id === 'placeholder') {
+        if (candidate?.id == null || candidate.id === 'placeholder') {
           return acc;
         }
 
@@ -154,21 +169,35 @@ const CandidatesTable = ({
           acc.ppi += 1;
         }
 
+        // Somar projeções de votos
+        const votoProjMax = Number(candidate.voto_proj_max) || 0;
+        const votoProjMin = Number(candidate.voto_proj_min) || 0;
+        const historicoVotos = Number(candidate.historico_votos) || 0;
+        acc.totalVotoProjMax += votoProjMax;
+        acc.totalVotoProjMin += votoProjMin;
+        acc.totalHistoricoVotos += historicoVotos;
+
         return acc;
       },
-      { femaleAffiliated: 0, confirmed: 0, negotiation: 0, ppi: 0 }
+      { femaleAffiliated: 0, confirmed: 0, negotiation: 0, ppi: 0, totalVotoProjMax: 0, totalVotoProjMin: 0, totalHistoricoVotos: 0 }
     );
 
     onFemaleAffiliatedCountChange(totals.femaleAffiliated);
     onConfirmedCountChange(totals.confirmed);
     onNegotiationCountChange(totals.negotiation);
     onPpiCountChange(totals.ppi);
+    onVotoProjMaxChange(totals.totalVotoProjMax);
+    onVotoProjMinChange(totals.totalVotoProjMin);
+    onHistoricoVotosChange(totals.totalHistoricoVotos);
   }, [
     candidates,
     onConfirmedCountChange,
     onFemaleAffiliatedCountChange,
     onNegotiationCountChange,
     onPpiCountChange,
+    onVotoProjMaxChange,
+    onVotoProjMinChange,
+    onHistoricoVotosChange,
   ]);
 
   const fetchCandidates = useCallback(async () => {
@@ -842,7 +871,9 @@ const CandidatesTable = ({
                         className="edit-input"
                       />
                     ) : (
-                      candidate.fefc_projetado
+                      candidate.fefc_projetado 
+                        ? formatCurrency(Number(candidate.fefc_projetado))
+                        : '-'
                     )}
                   </td>
                   <td>
@@ -854,7 +885,9 @@ const CandidatesTable = ({
                         className="edit-input"
                       />
                     ) : (
-                      candidate.fefc_historico
+                      candidate.fefc_historico 
+                        ? formatCurrency(Number(candidate.fefc_historico))
+                        : '-'
                     )}
                   </td>
                   <td>
