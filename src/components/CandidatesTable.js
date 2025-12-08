@@ -312,10 +312,6 @@ const CandidatesTable = ({
   const getStatusClass = (status) =>
     status === 'Filiado' ? 'status-filiado' : 'status-negociacao';
 
-  const filteredCandidates = candidates.filter((candidate) =>
-    candidate.nome_urna?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const handleAddClick = () => {
     setShowAddForm(true);
     if (selectedSuggestion) {
@@ -511,9 +507,6 @@ const CandidatesTable = ({
         {searchTerm && (
           <>
             <div className="search-feedback">
-              <span className="search-results">
-                {filteredCandidates.length} resultado(s) encontrado(s)
-              </span>
               {selectedSuggestion && (
                 <div className="search-selected">
                   Selecionado: <strong>{selectedSuggestion.nome}</strong>{' '}
@@ -759,7 +752,7 @@ const CandidatesTable = ({
             </tr>
           </thead>
           <tbody>
-            {filteredCandidates.map((candidate) => {
+            {candidates.map((candidate) => {
               const isEditing = editingId === candidate.id;
               const displayCandidate = isEditing ? editingCandidate : candidate;
 
