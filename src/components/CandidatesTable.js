@@ -52,7 +52,7 @@ const createEmptyCandidate = () => ({
   partido: '',
   genero: '',
   raca: '',
-  status: 'Filiado',
+  status: 'Em negociação',
   has_info: false,
   posicao_candidato: '',
 });
@@ -80,7 +80,6 @@ const mapSuggestionToCandidate = (suggestion) => {
     partido: data.partido ?? suggestion.partido ?? '',
     genero: data.genero ?? '',
     raca: normalizeRace(data.raca_cor) || normalizeRace(suggestion.raca),
-    status: data.situacao ?? 'Filiado',
   };
 };
 
