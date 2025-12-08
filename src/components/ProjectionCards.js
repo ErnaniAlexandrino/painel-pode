@@ -14,6 +14,9 @@ const ProjectionCards = ({
   totalHistoricoVotos = 0,
 }) => {
   const projecaoMaximaCadeiras = Math.floor(totalVotoProjMax / QUOCIENTE_ELETORAL);
+  const projecaoMinimaCadeiras = Math.floor(totalVotoProjMin / QUOCIENTE_ELETORAL);
+  // Soma dos históricos multiplicada pelo quociente eleitoral (conforme solicitado)
+  const projecaoHistorico = totalHistoricoVotos * QUOCIENTE_ELETORAL;
   return (
     <div className="projection-cards">
       <div className="projection-card">
@@ -23,13 +26,13 @@ const ProjectionCards = ({
       
       <div className="projection-card">
         <div className="card-header green">PROJEÇÃO MÍNIMA DE CADEIRAS</div>
-        <div className="projection-value">01</div>
+        <div className="projection-value">{String(projecaoMinimaCadeiras).padStart(2, '0')}</div>
       </div>
       
       <div className="projection-card">
         <div className="card-header green">SOMA DE VOTOS - PELO HISTÓRICO</div>
-        <div className="projection-value">1.234.560</div>
-        <div className="projection-subtitle">Equivalente a X% do Quociente Eleitoral</div>
+        <div className="projection-value">{formatNumber(projecaoHistorico)}</div>
+        <div className="projection-subtitle">Soma do histórico x Quociente Eleitoral</div>
       </div>
       
       <div className="projection-card">
@@ -46,7 +49,7 @@ const ProjectionCards = ({
       
       <div className="projection-card">
         <div className="card-header green">PROJEÇÃO DE VOTOS - HISTÓRICO</div>
-        <div className="projection-value">{formatNumber(totalHistoricoVotos)}</div>
+        <div className="projection-value">{formatNumber(projecaoHistorico)}</div>
         <div className="projection-subtitle">Histórico de Votos / Quociente Eleitoral</div>
       </div>
     </div>
