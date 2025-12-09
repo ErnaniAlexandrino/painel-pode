@@ -30,6 +30,13 @@ class CandidatoGridRepository:
             .first()
         )
 
+    def get_by_nome_urna(self, nome_urna: str) -> Optional[CandidatoGrid]:
+        return (
+            self.db.query(CandidatoGrid)
+            .filter(CandidatoGrid.nome_urna == nome_urna)
+            .first()
+        )
+
     def update(self, candidato_id: int, candidato_data: Dict) -> Optional[CandidatoGrid]:
         candidato = self.get_by_id(candidato_id)
         if not candidato:

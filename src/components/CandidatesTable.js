@@ -358,7 +358,17 @@ const CandidatesTable = ({
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao salvar candidato');
+        let message = 'Não foi possível cadastrar o candidato.';
+        try {
+          const errorData = await response.json();
+          if (errorData?.detail) {
+            message = errorData.detail;
+          }
+        } catch (_) {
+          // sem corpo JSON de erro, mantém mensagem padrão
+        }
+        alert(message);
+        return;
       }
 
       const createdCandidate = await response.json();

@@ -15,6 +15,11 @@ class CandidatoGridService:
         self.repository = CandidatoGridRepository(db)
 
     def create_candidato(self, candidato_data: CandidatoGridCreate) -> CandidatoGridRead:
+        # Verificar se já existe candidato com mesmo nome_urna
+        existente = self.repository.get_by_nome_urna(candidato_data.nome_urna)
+        if existente:
+            raise ValueError(f"Candidato '{candidato_data.nome_urna}' já está cadastrado.")
+
         candidato = self.repository.create(candidato_data.model_dump())
         return CandidatoGridRead.model_validate(candidato)
 
