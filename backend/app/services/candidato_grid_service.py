@@ -7,6 +7,7 @@ from ..schemas.candidato_grid import (
     CandidatoGridCreate,
     CandidatoGridRead,
     CandidatoGridUpdate,
+    CandidatoGridUpdateOrder,
 )
 
 
@@ -41,5 +42,8 @@ class CandidatoGridService:
             raise ValueError("Candidato não encontrado.")
         return CandidatoGridRead.model_validate(candidato)
 
+    def update_order(self, updates: List[CandidatoGridUpdateOrder]) -> None:
+        update_data = [u.model_dump() for u in updates]
+        self.repository.update_order(update_data)
 
 

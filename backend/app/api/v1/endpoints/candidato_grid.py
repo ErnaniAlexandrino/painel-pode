@@ -8,6 +8,7 @@ from ....schemas.candidato_grid import (
     CandidatoGridCreate,
     CandidatoGridRead,
     CandidatoGridUpdate,
+    CandidatoGridUpdateOrder,
 )
 from ....services.candidato_grid_service import CandidatoGridService
 
@@ -55,4 +56,17 @@ def listar_candidatos(db: Session = Depends(get_db)) -> List[CandidatoGridRead]:
     return service.list_candidatos()
 
 
+@router.put("/candidatos/update-order", status_code=status.HTTP_200_OK)
+def update_order(
+    payload: List[CandidatoGridUpdateOrder], db: Session = Depends(get_db)
+):
+    service = CandidatoGridService(db)
+    try:
+        service.update_order(payload)
+        return {"message": "Ordem dos candidatos atualizada com sucesso"}
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao atualizar a ordem dos candidatos",
+        ) from exc
 

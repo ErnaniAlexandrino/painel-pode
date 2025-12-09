@@ -16,6 +16,17 @@ class CandidatoGridRepository:
         self.db.refresh(candidato)
         return candidato
 
+    def update_order(self, updates: List[Dict[str, int]]):
+        try:
+            for update in updates:
+                self.db.query(CandidatoGrid).filter(
+                    CandidatoGrid.id == update["id"]
+                ).update({"posicao_candidato": update["posicao_candidato"]})
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            raise e
+
     def list_all(self) -> List[CandidatoGrid]:
         return (
             self.db.query(CandidatoGrid)

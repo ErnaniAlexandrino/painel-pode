@@ -51,4 +51,7 @@ class CandidatoGridUpdate(BaseModel):
     posicao_candidato: Optional[int] = None
 
 
+class CandidatoGridUpdateOrder(BaseModel):
+    id: int
+    posicao_candidato: int
 
