@@ -8,31 +8,37 @@ const formatNumber = (num) => {
 
 const QUOCIENTE_ELETORAL = 352120;
 
+// Função para formatar número com 2 casas decimais (padrão brasileiro)
+const formatDecimal = (num) => {
+  if (num === null || num === undefined) return '0,00';
+  return num.toFixed(2).replace('.', ',');
+};
+
 const ProjectionCards = ({
   totalVotoProjMax = 0,
   totalVotoProjMin = 0,
   totalHistoricoVotos = 0,
 }) => {
-  const projecaoMaximaCadeiras = Math.floor(totalVotoProjMax / QUOCIENTE_ELETORAL);
-  const projecaoMinimaCadeiras = Math.floor(totalVotoProjMin / QUOCIENTE_ELETORAL);
+  const projecaoMaximaCadeiras = totalVotoProjMax / QUOCIENTE_ELETORAL;
+  const projecaoMinimaCadeiras = totalVotoProjMin / QUOCIENTE_ELETORAL;
   // Soma dos históricos multiplicada pelo quociente eleitoral (conforme solicitado)
-  const projecaoHistorico = totalHistoricoVotos * QUOCIENTE_ELETORAL;
+  const projecaoHistorico = totalHistoricoVotos / QUOCIENTE_ELETORAL;
   return (
     <div className="projection-cards">
       <div className="projection-card">
         <div className="card-header green">PROJEÇÃO MÁXIMA DE CADEIRAS</div>
-        <div className="projection-value">{String(projecaoMaximaCadeiras).padStart(2, '0')}</div>
+        <div className="projection-value">{formatDecimal(projecaoMaximaCadeiras)}</div>
       </div>
       
       <div className="projection-card">
         <div className="card-header green">PROJEÇÃO MÍNIMA DE CADEIRAS</div>
-        <div className="projection-value">{String(projecaoMinimaCadeiras).padStart(2, '0')}</div>
+        <div className="projection-value">{formatDecimal(projecaoMinimaCadeiras)}</div>
       </div>
       
       <div className="projection-card">
-        <div className="card-header green">SOMA DE VOTOS - PELO HISTÓRICO</div>
-        <div className="projection-value">{formatNumber(projecaoHistorico)}</div>
-        <div className="projection-subtitle">Soma do histórico x Quociente Eleitoral</div>
+        <div className="card-header green">PROJEÇÃO DE CADEIRAS - PELO HISTÓRICO</div>
+        <div className="projection-value">{formatDecimal(projecaoHistorico)}</div>
+        <div className="projection-subtitle">Soma do histórico Votação % Quociente Eleitoral</div>
       </div>
       
       <div className="projection-card">
