@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 const API_V1_BASE_URL = process.env.REACT_APP_API_V1_BASE_URL || 'http://localhost:8000/api/v1';
@@ -494,6 +495,47 @@ const CandidatesTable = ({
     setAutoCompleteOptions([]);
   };
 
+  const onDragEnd = async (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const items = Array.from(candidates);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    const updatedCandidates = items.map((candidate, index) => ({
+      ...candidate,
+      posicao_candidato: index + 1,
+    }));
+
+    const originalCandidates = candidates;
+    setCandidates(updatedCandidates);
+
+    const backendPayload = updatedCandidates.map((candidate) => ({
+      id: candidate.id,
+      ...buildGridPayload(candidate),
+    }));
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/candidatos/update-order`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(backendPayload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save the new order.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while saving the new order. Please try again.');
+      setCandidates(originalCandidates);
+    }
+  };
+
   return (
     <div className="table-container">
       <div className="search-container">
@@ -738,10 +780,11 @@ const CandidatesTable = ({
       {isLoading ? (
         <div className="loading-message">Carregando candidatos...</div>
       ) : (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Vagas</th>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Vagas</th>
               <th>Posição</th>
               <th>Nome de Urna</th>
               <th>Voto Proj. MAX.</th>
@@ -760,262 +803,284 @@ const CandidatesTable = ({
               <th>Ações</th>
             </tr>
           </thead>
-          <tbody>
-            {candidates.map((candidate) => {
-              const isEditing = editingId === candidate.id;
-              const displayCandidate = isEditing ? editingCandidate : candidate;
+          <Droppable droppableId="candidates">
+            {(provided) => (
+              <tbody {...provided.droppableProps} ref={provided.innerRef}>
+                {candidates.map((candidate, index) => {
+                  const isEditing = editingId === candidate.id;
+                  const displayCandidate = isEditing ? editingCandidate : candidate;
 
-              return (
-                <tr key={candidate.id ?? `${candidate.vaga}-${candidate.posicao_candidato}`}>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.vaga ?? ''}
-                        onChange={(e) => handleEditChange('vaga', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.vaga || '-'
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="number"
-                        value={displayCandidate.posicao_candidato ?? ''}
-                        onChange={(e) => handleEditChange('posicao_candidato', e.target.value)}
-                        className="edit-input"
-                        min="1"
-                      />
-                    ) : (
-                      candidate.posicao_candidato
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.nome_urna ?? ''}
-                        onChange={(e) => handleEditChange('nome_urna', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.nome_urna
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.voto_proj_max ?? ''}
-                        onChange={(e) => handleEditChange('voto_proj_max', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.voto_proj_max
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.voto_proj_min ?? ''}
-                        onChange={(e) => handleEditChange('voto_proj_min', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.voto_proj_min
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.historico_votos ?? ''}
-                        onChange={(e) => handleEditChange('historico_votos', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.historico_votos
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.cargo_disputado ?? ''}
-                        onChange={(e) => handleEditChange('cargo_disputado', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.cargo_disputado
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.ano ?? ''}
-                        onChange={(e) => handleEditChange('ano', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.ano
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.fefc_projetado ?? ''}
-                        onChange={(e) => handleEditChange('fefc_projetado', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.fefc_projetado 
-                        ? formatCurrency(Number(candidate.fefc_projetado))
-                        : '-'
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.fefc_historico ?? ''}
-                        onChange={(e) => handleEditChange('fefc_historico', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.fefc_historico 
-                        ? formatCurrency(Number(candidate.fefc_historico))
-                        : '-'
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.reduto ?? ''}
-                        onChange={(e) => handleEditChange('reduto', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.reduto
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.partido ?? ''}
-                        onChange={(e) => handleEditChange('partido', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.partido
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={displayCandidate.genero ?? ''}
-                        onChange={(e) => handleEditChange('genero', e.target.value)}
-                        className="edit-input"
-                      />
-                    ) : (
-                      candidate.genero
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <select
-                        value={displayCandidate.raca ?? ''}
-                        onChange={(e) => handleEditChange('raca', e.target.value)}
-                        className={`status-select`}
-                      >
-                        <option value="">Selecione</option>
-                        {RACE_OPTIONS.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      candidate.raca
-                    )}
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <select
-                        value={displayCandidate.status ?? 'Filiado'}
-                        onChange={(e) => handleEditChange('status', e.target.value)}
-                        className={`status-select ${getStatusClass(displayCandidate.status)}`}
-                      >
-                        <option value="Filiado">Filiado</option>
-                        <option value="Em negociação">Em Negociação</option>
-                      </select>
-                    ) : (
-                      <select
-                        value={candidate.status}
-                        onChange={(e) => handleStatusChange(candidate.id, e.target.value)}
-                        className={`status-select ${getStatusClass(candidate.status)}`}
-                      >
-                        <option value="Filiado">Filiado</option>
-                        <option value="Em negociação">Em Negociação</option>
-                      </select>
-                    )}
-                  </td>
-                  <td>
-                    <div className={`info-icon ${!candidate.has_info ? 'disabled' : ''}`}>i</div>
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <div className="action-buttons">
-                        <button
-                          className="action-btn save-btn"
-                          onClick={handleSaveEdit}
-                          title="Salvar alterações"
-                          disabled={isSavingEdit}
+                  return (
+                    <Draggable
+                      key={candidate.id}
+                      draggableId={String(candidate.id)}
+                      index={index}
+                    >
+                      {(provided, snapshot) => (
+                        <tr
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{
+                            ...provided.draggableProps.style,
+                            boxShadow: snapshot.isDragging ? '0 0 .4rem rgba(0,0,0,.5)' : 'none',
+                          }}
                         >
-                          {isSavingEdit ? '...' : '✓'}
-                        </button>
-                        <button
-                          className="action-btn cancel-btn"
-                          onClick={handleCancelEdit}
-                          title="Cancelar"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="action-buttons">
-                        <button
-                          className="action-btn edit-btn"
-                          onClick={() => handleEditClick(candidate)}
-                          title="Editar"
-                        >
-                          ✎
-                        </button>
-                        <button
-                          className="action-btn delete-btn"
-                          onClick={() => handleDeleteClick(candidate.id)}
-                          title="Excluir"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.vaga ?? ''}
+                                onChange={(e) => handleEditChange('vaga', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.vaga || '-'
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="number"
+                                value={displayCandidate.posicao_candidato ?? ''}
+                                onChange={(e) => handleEditChange('posicao_candidato', e.target.value)}
+                                className="edit-input"
+                                min="1"
+                              />
+                            ) : (
+                              candidate.posicao_candidato
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.nome_urna ?? ''}
+                                onChange={(e) => handleEditChange('nome_urna', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.nome_urna
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.voto_proj_max ?? ''}
+                                onChange={(e) => handleEditChange('voto_proj_max', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.voto_proj_max
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.voto_proj_min ?? ''}
+                                onChange={(e) => handleEditChange('voto_proj_min', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.voto_proj_min
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.historico_votos ?? ''}
+                                onChange={(e) => handleEditChange('historico_votos', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.historico_votos
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.cargo_disputado ?? ''}
+                                onChange={(e) => handleEditChange('cargo_disputado', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.cargo_disputado
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.ano ?? ''}
+                                onChange={(e) => handleEditChange('ano', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.ano
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.fefc_projetado ?? ''}
+                                onChange={(e) => handleEditChange('fefc_projetado', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.fefc_projetado
+                                ? formatCurrency(Number(candidate.fefc_projetado))
+                                : '-'
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.fefc_historico ?? ''}
+                                onChange={(e) => handleEditChange('fefc_historico', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.fefc_historico
+                                ? formatCurrency(Number(candidate.fefc_historico))
+                                : '-'
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.reduto ?? ''}
+                                onChange={(e) => handleEditChange('reduto', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.reduto
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.partido ?? ''}
+                                onChange={(e) => handleEditChange('partido', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.partido
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={displayCandidate.genero ?? ''}
+                                onChange={(e) => handleEditChange('genero', e.target.value)}
+                                className="edit-input"
+                              />
+                            ) : (
+                              candidate.genero
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <select
+                                value={displayCandidate.raca ?? ''}
+                                onChange={(e) => handleEditChange('raca', e.target.value)}
+                                className={`status-select`}
+                              >
+                                <option value="">Selecione</option>
+                                {RACE_OPTIONS.map((option) => (
+                                  <option key={option} value={option}>
+                                    {option}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              candidate.raca
+                            )}
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <select
+                                value={displayCandidate.status ?? 'Filiado'}
+                                onChange={(e) => handleEditChange('status', e.target.value)}
+                                className={`status-select ${getStatusClass(displayCandidate.status)}`}
+                              >
+                                <option value="Filiado">Filiado</option>
+                                <option value="Em negociação">Em Negociação</option>
+                              </select>
+                            ) : (
+                              <select
+                                value={candidate.status}
+                                onChange={(e) => handleStatusChange(candidate.id, e.target.value)}
+                                className={`status-select ${getStatusClass(candidate.status)}`}
+                              >
+                                <option value="Filiado">Filiado</option>
+                                <option value="Em negociação">Em Negociação</option>
+                              </select>
+                            )}
+                          </td>
+                          <td>
+                            <div className={`info-icon ${!candidate.has_info ? 'disabled' : ''}`}>i</div>
+                          </td>
+                          <td>
+                            {isEditing ? (
+                              <div className="action-buttons">
+                                <button
+                                  className="action-btn save-btn"
+                                  onClick={handleSaveEdit}
+                                  title="Salvar alterações"
+                                  disabled={isSavingEdit}
+                                >
+                                  {isSavingEdit ? '...' : '✓'}
+                                </button>
+                                <button
+                                  className="action-btn cancel-btn"
+                                  onClick={handleCancelEdit}
+                                  title="Cancelar"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="action-buttons">
+                                <button
+                                  className="action-btn edit-btn"
+                                  onClick={() => handleEditClick(candidate)}
+                                  title="Editar"
+                                >
+                                  ✎
+                                </button>
+                                <button
+                                  className="action-btn delete-btn"
+                                  onClick={() => handleDeleteClick(candidate.id)}
+                                  title="Excluir"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )}
+                    </Draggable>
+                  );
+                })}
+                {provided.placeholder}
+              </tbody>
+            )}
+          </Droppable>
         </table>
-      )}
-    </div>
-  );
+      </DragDropContext>
+    )}
+  </div>
+);
 };
 
 export default CandidatesTable;
