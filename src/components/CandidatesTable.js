@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import Modal from './Modal';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 const API_V1_BASE_URL = process.env.REACT_APP_API_V1_BASE_URL || 'http://localhost:8000/api/v1';
@@ -136,6 +137,17 @@ const CandidatesTable = ({
   const [selectedSuggestion, setSelectedSuggestion] = useState(null);
   const [hasFetchError, setHasFetchError] = useState(false);
 
+  // Estados do Modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState('error');
+
+  const showModal = (message, type = 'error') => {
+    setModalMessage(message);
+    setModalType(type);
+    setModalOpen(true);
+  };
+
   useEffect(() => {
     if (!Array.isArray(candidates)) {
       onFemaleAffiliatedCountChange(0);
@@ -219,7 +231,7 @@ const CandidatesTable = ({
       setHasFetchError(false);
     } catch (error) {
       console.error(error);
-      alert('Não foi possível carregar os candidatos.');
+      showModal('Não foi possível carregar os candidatos.', 'error');
       setHasFetchError(true);
       const fallback = [placeholderCandidate];
       setCandidates(fallback);
@@ -314,10 +326,19 @@ const CandidatesTable = ({
 
   const handleAddClick = () => {
     setShowAddForm(true);
+    const validCandidates = candidates.filter(c => c.id !== 'placeholder');
+    const nextPosition = validCandidates.length + 1;
+
     if (selectedSuggestion) {
-      setNewCandidate(mapSuggestionToCandidate(selectedSuggestion));
+      setNewCandidate({
+        ...mapSuggestionToCandidate(selectedSuggestion),
+        posicao_candidato: nextPosition,
+      });
     } else {
-      setNewCandidate(createEmptyCandidate());
+      setNewCandidate({
+        ...createEmptyCandidate(),
+        posicao_candidato: nextPosition,
+      });
     }
   };
 
@@ -330,7 +351,7 @@ const CandidatesTable = ({
 
   const handleOkClick = async () => {
     if (!newCandidate.nome_urna.trim()) {
-      alert('Por favor, preencha o nome de urna.');
+      showModal('Por favor, preencha o nome de urna.', 'warning');
       return;
     }
 
@@ -338,7 +359,7 @@ const CandidatesTable = ({
       !newCandidate.posicao_candidato ||
       Number.isNaN(Number(newCandidate.posicao_candidato))
     ) {
-      alert('Informe a posição do candidato no grid.');
+      showModal('Informe a posição do candidato no grid.', 'warning');
       return;
     }
 
@@ -368,7 +389,7 @@ const CandidatesTable = ({
         } catch (_) {
           // sem corpo JSON de erro, mantém mensagem padrão
         }
-        alert(message);
+        showModal(message, 'error');
         return;
       }
 
@@ -378,7 +399,7 @@ const CandidatesTable = ({
       setNewCandidate(createEmptyCandidate());
     } catch (error) {
       console.error(error);
-      alert('Não foi possível cadastrar o candidato.');
+      showModal('Não foi possível cadastrar o candidato.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -422,7 +443,7 @@ const CandidatesTable = ({
 
   const handleSaveEdit = async () => {
     if (!editingCandidate || !editingCandidate.nome_urna?.trim()) {
-      alert('Por favor, preencha o nome de urna.');
+      showModal('Por favor, preencha o nome de urna.', 'warning');
       return;
     }
 
@@ -430,12 +451,12 @@ const CandidatesTable = ({
       !editingCandidate.posicao_candidato ||
       Number.isNaN(Number(editingCandidate.posicao_candidato))
     ) {
-      alert('Informe uma posição válida para o candidato.');
+      showModal('Informe uma posição válida para o candidato.', 'warning');
       return;
     }
 
     if (!editingCandidate.id) {
-      alert('Não foi possível identificar o candidato para atualização.');
+      showModal('Não foi possível identificar o candidato para atualização.', 'error');
       return;
     }
 
@@ -468,7 +489,7 @@ const CandidatesTable = ({
       setEditingCandidate(null);
     } catch (error) {
       console.error(error);
-      alert('Não foi possível salvar as alterações do candidato.');
+      showModal('Não foi possível salvar as alterações do candidato.', 'error');
     } finally {
       setIsSavingEdit(false);
     }
@@ -531,7 +552,7 @@ const CandidatesTable = ({
       }
     } catch (error) {
       console.error(error);
-      alert('An error occurred while saving the new order. Please try again.');
+      showModal('Ocorreu um erro ao salvar a nova ordem. Por favor, tente novamente.', 'error');
       setCandidates(originalCandidates);
     }
   };
@@ -626,9 +647,9 @@ const CandidatesTable = ({
               <input
                 type="number"
                 value={newCandidate.posicao_candidato}
-                onChange={(e) => handleInputChange('posicao_candidato', e.target.value)}
                 placeholder="Posição"
                 min="1"
+                disabled
               />
             </div>
             <div className="form-cell">
@@ -1057,6 +1078,12 @@ const CandidatesTable = ({
         </table>
       </DragDropContext>
     )}
+    <Modal
+      isOpen={modalOpen}
+      onClose={() => setModalOpen(false)}
+      message={modalMessage}
+      type={modalType}
+    />
   </div>
 );
 };
