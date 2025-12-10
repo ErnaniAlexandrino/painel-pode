@@ -612,15 +612,6 @@ const CandidatesTable = ({
           </div>
           <div className="add-form-grid">
             <div className="form-cell">
-              <label>Vagas</label>
-              <input
-                type="text"
-                value={newCandidate.vaga}
-                onChange={(e) => handleInputChange('vaga', e.target.value)}
-                placeholder="Vaga/ID"
-              />
-            </div>
-            <div className="form-cell">
               <label>Nome de Urna</label>
               <input
                 type="text"
@@ -784,7 +775,6 @@ const CandidatesTable = ({
           <table className="table">
             <thead>
               <tr>
-                <th>Vagas</th>
               <th>Posição</th>
               <th>Nome de Urna</th>
               <th>Voto Proj. MAX.</th>
@@ -826,18 +816,6 @@ const CandidatesTable = ({
                             boxShadow: snapshot.isDragging ? '0 0 .4rem rgba(0,0,0,.5)' : 'none',
                           }}
                         >
-                          <td>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={displayCandidate.vaga ?? ''}
-                                onChange={(e) => handleEditChange('vaga', e.target.value)}
-                                className="edit-input"
-                              />
-                            ) : (
-                              candidate.vaga || '-'
-                            )}
-                          </td>
                           <td>
                             {isEditing ? (
                               <input
