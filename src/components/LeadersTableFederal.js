@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 
 const API_V1_BASE_URL = process.env.REACT_APP_API_V1_BASE_URL || 'http://localhost:8000/api/v1';
 
@@ -40,7 +40,7 @@ const LeadersTableFederal = () => {
   }, [filters]);
 
   // Aplica os filtros aos dados
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...originalData];
 
     if (filters.party) {
@@ -63,7 +63,7 @@ const LeadersTableFederal = () => {
     }
 
     setLeadersData(filtered);
-  };
+  }, [filters, originalData]);
 
   // Limpa todos os filtros
   const clearFilters = () => {
@@ -90,7 +90,7 @@ const LeadersTableFederal = () => {
     if (originalData.length > 0) {
       applyFilters();
     }
-  }, [filters, originalData]);
+  }, [applyFilters, originalData]);
 
   const fetchCandidatosSP2224 = async () => {
     try {
@@ -152,136 +152,138 @@ const LeadersTableFederal = () => {
           {error}
         </div>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Nome Completo</th>
-              <th>Nome Urna</th>
-              <th>Partido</th>
-              <th>Votos</th>
-              <th>Fundo Total</th>
-              <th>Cargo</th>
-              <th>Gênero</th>
-              <th>Raça</th>
-              <th>Ano</th>
-              <th>Resultado</th>
-            </tr>
-            <tr className="filter-row">
-              <th></th>
-              <th></th>
-              <th>
-                <select
-                  className="filter-select"
-                  value={filters.party}
-                  onChange={(e) => handleFilterChange('party', e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  {getUniqueValues('party').map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </th>
-              <th></th>
-              <th></th>
-              <th>
-                <select
-                  className="filter-select"
-                  value={filters.cargo}
-                  onChange={(e) => handleFilterChange('cargo', e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  {getUniqueValues('cargo').map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </th>
-              <th>
-                <select
-                  className="filter-select"
-                  value={filters.genero}
-                  onChange={(e) => handleFilterChange('genero', e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  {getUniqueValues('genero').map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </th>
-              <th>
-                <select
-                  className="filter-select"
-                  value={filters.raca}
-                  onChange={(e) => handleFilterChange('raca', e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  {getUniqueValues('raca').map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </th>
-              <th>
-                <select
-                  className="filter-select"
-                  value={filters.ano}
-                  onChange={(e) => handleFilterChange('ano', e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  {getUniqueValues('ano').map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </th>
-              <th>
-                <select
-                  className="filter-select"
-                  value={filters.resultado_agregado}
-                  onChange={(e) => handleFilterChange('resultado_agregado', e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  {getUniqueValues('resultado_agregado').map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {leadersData.length === 0 ? (
+        <div className="leaders-table-scroll">
+          <table>
+            <thead>
               <tr>
-                <td colSpan="10" style={{ textAlign: 'center', padding: '20px' }}>
-                  Nenhum dado disponível
-                </td>
+                <th>Nome Completo</th>
+                <th>Nome Urna</th>
+                <th>Partido</th>
+                <th>Votos</th>
+                <th>Fundo Total</th>
+                <th>Cargo</th>
+                <th>Gênero</th>
+                <th>Raça</th>
+                <th>Ano</th>
+                <th>Resultado</th>
               </tr>
-            ) : (
-              leadersData.map((leader, index) => (
-                <tr key={index}>
-                  <td>{leader.nome_completo}</td>
-                  <td>{leader.nome_urna}</td>
-                  <td>{leader.party}</td>
-                  <td>{leader.votes}</td>
-                  <td>{leader.fefc}</td>
-                  <td>{leader.cargo}</td>
-                  <td>{leader.genero}</td>
-                  <td>{leader.raca}</td>
-                  <td>{leader.ano}</td>
-                  <td>{leader.resultado_agregado}</td>
+              <tr className="filter-row">
+                <th></th>
+                <th></th>
+                <th>
+                  <select
+                    className="filter-select"
+                    value={filters.party}
+                    onChange={(e) => handleFilterChange('party', e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    {getUniqueValues('party').map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </th>
+                <th></th>
+                <th></th>
+                <th>
+                  <select
+                    className="filter-select"
+                    value={filters.cargo}
+                    onChange={(e) => handleFilterChange('cargo', e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    {getUniqueValues('cargo').map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </th>
+                <th>
+                  <select
+                    className="filter-select"
+                    value={filters.genero}
+                    onChange={(e) => handleFilterChange('genero', e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    {getUniqueValues('genero').map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </th>
+                <th>
+                  <select
+                    className="filter-select"
+                    value={filters.raca}
+                    onChange={(e) => handleFilterChange('raca', e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    {getUniqueValues('raca').map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </th>
+                <th>
+                  <select
+                    className="filter-select"
+                    value={filters.ano}
+                    onChange={(e) => handleFilterChange('ano', e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    {getUniqueValues('ano').map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </th>
+                <th>
+                  <select
+                    className="filter-select"
+                    value={filters.resultado_agregado}
+                    onChange={(e) => handleFilterChange('resultado_agregado', e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    {getUniqueValues('resultado_agregado').map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {leadersData.length === 0 ? (
+                <tr>
+                  <td colSpan="10" style={{ textAlign: 'center', padding: '20px' }}>
+                    Nenhum dado disponível
+                  </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                leadersData.map((leader, index) => (
+                  <tr key={index}>
+                    <td>{leader.nome_completo}</td>
+                    <td>{leader.nome_urna}</td>
+                    <td>{leader.party}</td>
+                    <td>{leader.votes}</td>
+                    <td>{leader.fefc}</td>
+                    <td>{leader.cargo}</td>
+                    <td>{leader.genero}</td>
+                    <td>{leader.raca}</td>
+                    <td>{leader.ano}</td>
+                    <td>{leader.resultado_agregado}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

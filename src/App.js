@@ -28,23 +28,24 @@ function App() {
 
   return (
     <div className="app">
-      <button 
-        className="mobile-menu-toggle" 
-        onClick={toggleSidebar}
-        aria-label="Toggle menu"
-      >
-        ☰
-      </button>
-      
-      <div 
-        className={`mobile-overlay ${sidebarOpen ? 'show' : ''}`}
-        onClick={closeSidebar}
-      ></div>
-      
-      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-      
-      <div className="main-content">
-        <Header />
+      <Header />
+      <div className="app-content-wrapper">
+        <button 
+          className="mobile-menu-toggle" 
+          onClick={toggleSidebar}
+          aria-label="Toggle menu"
+        >
+          ☰
+        </button>
+        
+        <div 
+          className={`mobile-overlay ${sidebarOpen ? 'show' : ''}`}
+          onClick={closeSidebar}
+        ></div>
+        
+        <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+        
+        <div className="main-content">
         <MetricsCards
           femaleAffiliatedCount={femaleAffiliatedCount}
           confirmedCount={confirmedCount}
@@ -74,6 +75,7 @@ function App() {
               totalHistoricoVotos={totalHistoricoVotos}
             />
           </div>
+        </div>
         </div>
       </div>
     </div>

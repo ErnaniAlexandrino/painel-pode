@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logoSedip from '../assests/imagens/logo_sedip.svg';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const [isEstaduaisOpen, setIsEstaduaisOpen] = useState(false);
@@ -17,12 +18,6 @@ const Sidebar = ({ isOpen, onClose }) => {
   ];
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
-      <div className="sidebar-header">
-        <div className="logo">
-          20 PODEMOS MUDAR O BRASIL
-        </div>
-      </div>
-      
       <div className="profile-section">
         <div className="profile-image">
           👤
@@ -68,7 +63,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       </nav>
       
       <div className="footer">
-        SEDIP SECRETARIA DE DESENVOLVIMENTO E INOVAÇÃO PARTIDÁRIA
+        <img src={logoSedip} alt="SEDIP" />
       </div>
     </div>
   );
