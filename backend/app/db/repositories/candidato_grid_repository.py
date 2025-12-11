@@ -64,6 +64,17 @@ class CandidatoGridRepository:
     def delete(self, candidato_id: int) -> None:
         candidato = self.get_by_id(candidato_id)
         if candidato:
+            posicao_excluida = candidato.posicao_candidato
             self.db.delete(candidato)
+            
+            # Reindexar: decrementar posicao de todos com posicao maior
+            if posicao_excluida is not None:
+                self.db.query(CandidatoGrid).filter(
+                    CandidatoGrid.posicao_candidato > posicao_excluida
+                ).update(
+                    {CandidatoGrid.posicao_candidato: CandidatoGrid.posicao_candidato - 1},
+                    synchronize_session='fetch'
+                )
+            
             self.db.commit()
 

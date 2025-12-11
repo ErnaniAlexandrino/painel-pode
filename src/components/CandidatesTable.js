@@ -313,12 +313,52 @@ const CandidatesTable = ({
     }
   }, [searchTerm, selectedSuggestion]);
 
-  const handleStatusChange = (candidateId, newStatus) => {
+  const handleStatusChange = async (candidateId, newStatus) => {
+    // Buscar o candidato antes de atualizar o estado
+    const candidate = candidates.find((c) => c.id === candidateId);
+    if (!candidate) {
+      showModal('Candidato não encontrado.', 'error');
+      return;
+    }
+
+    // Atualizar estado local imediatamente para feedback visual
+    const previousCandidates = [...candidates];
     setCandidates((prevCandidates) =>
-      prevCandidates.map((candidate) =>
-        candidate.id === candidateId ? { ...candidate, status: newStatus } : candidate
+      prevCandidates.map((c) =>
+        c.id === candidateId ? { ...c, status: newStatus } : c
       )
     );
+
+    try {
+      // Criar payload com o candidato atualizado com o novo status
+      const updatedCandidate = { ...candidate, status: newStatus };
+      const payload = buildGridPayload(updatedCandidate);
+
+      const response = await fetch(`${API_BASE_URL}/candidato/${candidateId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar status');
+      }
+
+      // Atualizar com a resposta do servidor
+      const savedCandidate = await response.json();
+      setCandidates((prev) =>
+        sortByPosition(
+          prev.map((c) => (c.id === savedCandidate.id ? savedCandidate : c))
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      // Reverter para o estado anterior em caso de erro
+      setCandidates(previousCandidates);
+      showModal('Não foi possível atualizar o status do candidato.', 'error');
+    }
   };
 
   const getStatusClass = (status) =>
@@ -534,11 +574,13 @@ const CandidatesTable = ({
         return;
       }
 
-      setCandidates((prev) => prev.filter((candidate) => candidate.id !== candidateId));
       if (editingId === candidateId) {
         setEditingId(null);
         setEditingCandidate(null);
       }
+
+      // Recarregar lista do backend para obter posições reindexadas
+      await fetchCandidates();
       showModal('Candidato excluído com sucesso.', 'success');
     } catch (error) {
       console.error(error);
