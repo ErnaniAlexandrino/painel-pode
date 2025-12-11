@@ -70,3 +70,17 @@ def update_order(
             detail="Erro ao atualizar a ordem dos candidatos",
         ) from exc
 
+
+@router.delete(
+    "/candidato/{candidato_id}",
+    status_code=status.HTTP_200_OK,
+)
+def deletar_candidato(
+    candidato_id: int, db: Session = Depends(get_db)
+):
+    service = CandidatoGridService(db)
+    try:
+        service.delete_candidato(candidato_id)
+        return {"message": "Candidato excluído com sucesso"}
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc

@@ -45,7 +45,7 @@ const createEmptyCandidate = () => ({
   nome_urna: '',
   voto_proj_max: '',
   voto_proj_min: '',
-  historico_votos: '',
+  historico_votos: '0',
   cargo_disputado: '',
   ano: '',
   fefc_projetado: '',
@@ -72,7 +72,7 @@ const mapSuggestionToCandidate = (suggestion) => {
     historico_votos:
       data.historico_de_votos !== null && data.historico_de_votos !== undefined
         ? String(data.historico_de_votos)
-        : '',
+        : '0',
     cargo_disputado: data.cargo ?? suggestion.cargo ?? '',
     ano: data.ano !== null && data.ano !== undefined ? String(data.ano) : '',
     fefc_historico:
@@ -330,8 +330,10 @@ const CandidatesTable = ({
     const nextPosition = validCandidates.length + 1;
 
     if (selectedSuggestion) {
+      const candidate = mapSuggestionToCandidate(selectedSuggestion);
       setNewCandidate({
-        ...mapSuggestionToCandidate(selectedSuggestion),
+        ...candidate,
+        historico_votos: candidate.historico_votos || '0',
         posicao_candidato: nextPosition,
       });
     } else {
@@ -500,13 +502,47 @@ const CandidatesTable = ({
     setEditingCandidate(null);
   };
 
-  const handleDeleteClick = (candidateId) => {
-    if (window.confirm('Tem certeza que deseja excluir este candidato?')) {
+  const handleDeleteClick = async (candidateId) => {
+    if (!candidateId || candidateId === 'placeholder') {
+      showModal('Não é possível excluir este candidato.', 'warning');
+      return;
+    }
+
+    if (!window.confirm('Tem certeza que deseja excluir este candidato?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/candidato/${candidateId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        let message = 'Não foi possível excluir o candidato.';
+        try {
+          const errorData = await response.json();
+          if (errorData?.detail) {
+            message = errorData.detail;
+          }
+        } catch (_) {
+          // sem corpo JSON de erro, mantém mensagem padrão
+        }
+        showModal(message, 'error');
+        return;
+      }
+
       setCandidates((prev) => prev.filter((candidate) => candidate.id !== candidateId));
       if (editingId === candidateId) {
         setEditingId(null);
         setEditingCandidate(null);
       }
+      showModal('Candidato excluído com sucesso.', 'success');
+    } catch (error) {
+      console.error(error);
+      showModal('Não foi possível excluir o candidato.', 'error');
     }
   };
 
@@ -674,9 +710,10 @@ const CandidatesTable = ({
               <label>Hist. Votação</label>
               <input
                 type="text"
-                value={newCandidate.historico_votos}
+                value={newCandidate.historico_votos || '0'}
                 onChange={(e) => handleInputChange('historico_votos', e.target.value)}
                 placeholder="Histórico"
+                disabled
               />
             </div>
             <div className="form-cell">

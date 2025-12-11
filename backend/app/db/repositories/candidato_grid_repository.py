@@ -61,3 +61,9 @@ class CandidatoGridRepository:
         self.db.refresh(candidato)
         return candidato
 
+    def delete(self, candidato_id: int) -> None:
+        candidato = self.get_by_id(candidato_id)
+        if candidato:
+            self.db.delete(candidato)
+            self.db.commit()
+

@@ -55,8 +55,8 @@ const ProjectionCards = ({
       
       <div className="projection-card">
         <div className="card-header green">PROJEÇÃO DE VOTOS - HISTÓRICO</div>
-        <div className="projection-value">{formatNumber(projecaoHistorico)}</div>
-        <div className="projection-subtitle">Histórico de Votos / Quociente Eleitoral</div>
+        <div className="projection-value">{formatNumber(totalHistoricoVotos)}</div>
+        <div className="projection-subtitle">Soma a coluna Hist. Votação</div>
       </div>
     </div>
   );

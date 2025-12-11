@@ -46,4 +46,10 @@ class CandidatoGridService:
         update_data = [u.model_dump() for u in updates]
         self.repository.update_order(update_data)
 
+    def delete_candidato(self, candidato_id: int) -> None:
+        candidato = self.repository.get_by_id(candidato_id)
+        if not candidato:
+            raise ValueError("Candidato não encontrado.")
+        self.repository.delete(candidato_id)
+
 
