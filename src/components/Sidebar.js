@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import logoSedip from '../assests/imagens/logo_sedip.svg';
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, onEstadoSelect }) => {
   const [isEstaduaisOpen, setIsEstaduaisOpen] = useState(false);
+  const { user, selectedEstado, setSelectedEstado } = useAuth();
 
   const toggleEstaduais = () => {
     setIsEstaduaisOpen(!isEstaduaisOpen);
   };
 
-  const estadosBrasileiros = [
-    'ACRE', 'ALAGOAS', 'AMAPÁ', 'AMAZONAS', 'BAHIA', 'CEARÁ',
-    'DISTRITO FEDERAL', 'ESPÍRITO SANTO', 'GOIÁS', 'MARANHÃO',
-    'MATO GROSSO', 'MATO GROSSO DO SUL', 'MINAS GERAIS', 'PARÁ',
-    'PARAÍBA', 'PARANÁ', 'PERNAMBUCO', 'PIAUÍ', 'RIO DE JANEIRO',
-    'RIO GRANDE DO NORTE', 'RIO GRANDE DO SUL', 'RONDÔNIA',
-    'RORAIMA', 'SANTA CATARINA', 'SÃO PAULO', 'SERGIPE', 'TOCANTINS'
-  ];
+  const handleEstadoClick = (estado) => {
+    setSelectedEstado(estado);
+    if (onEstadoSelect) {
+      onEstadoSelect(estado);
+    }
+    onClose();
+  };
+
+  // Usar apenas os estados permitidos para o usuário
+  const estadosPermitidos = user?.estados || [];
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="profile-section">
@@ -23,7 +27,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           👤
         </div>
         <div className="state-info">
-          <div className="state-name">Olá, {'< Nome do Gestor>'}</div>
+          <div className="state-name">Olá, {user?.full_name || user?.email || 'Usuário'}</div>
           <div className="election-year">ELEIÇÕES 2026</div>
         </div>
       </div>
@@ -37,11 +41,21 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
           {isEstaduaisOpen && (
             <div className="submenu">
-              {estadosBrasileiros.map((estado, index) => (
-                <button key={index} className="submenu-item" onClick={onClose}>
-                  {estado}
-                </button>
-              ))}
+              {estadosPermitidos.length === 0 ? (
+                <div className="submenu-item" style={{ cursor: 'default', opacity: 0.7 }}>
+                  Nenhum estado disponível
+                </div>
+              ) : (
+                estadosPermitidos.map((estado, index) => (
+                  <button
+                    key={index}
+                    className={`submenu-item ${selectedEstado === estado ? 'active' : ''}`}
+                    onClick={() => handleEstadoClick(estado)}
+                  >
+                    {estado}
+                  </button>
+                ))
+              )}
             </div>
           )}
         </div>

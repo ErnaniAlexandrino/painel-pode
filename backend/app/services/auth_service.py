@@ -27,6 +27,8 @@ class AuthService:
             email=user_in.email,
             hashed_password=hashed_password,
             full_name=user_in.full_name,
+            perfil=user_in.perfil,
+            estados=user_in.estados,
         )
         return UserRead.model_validate(user)
 
@@ -40,7 +42,13 @@ class AuthService:
 
         expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
         token = create_access_token(
-            subject={"sub": str(user.id), "email": user.email},
+            subject={
+                "sub": str(user.id),
+                "email": user.email,
+                "full_name": user.full_name,
+                "perfil": user.perfil,
+                "estados": user.estados,
+            },
             expires_delta=expires_delta,
         )
 

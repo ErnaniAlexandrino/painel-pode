@@ -178,6 +178,12 @@ code {
   background: rgba(0, 0, 0, 0.1);
 }
 
+.submenu-item.active {
+  background: rgba(30, 58, 138, 0.2);
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -1064,7 +1070,7 @@ code {
   .app-content-wrapper {
     margin-top: 80px;
   }
-
+  
   .sidebar {
     position: fixed;
     top: 80px;

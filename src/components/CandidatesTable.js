@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useAuth } from '../context/AuthContext';
 import Modal from './Modal';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
@@ -115,6 +116,7 @@ const sortByPosition = (items) =>
 const PPI_RACES = new Set(['preta', 'parda', 'indígena']);
 
 const CandidatesTable = ({
+  estado,
   onFemaleAffiliatedCountChange = () => {},
   onConfirmedCountChange = () => {},
   onNegotiationCountChange = () => {},
@@ -123,6 +125,7 @@ const CandidatesTable = ({
   onVotoProjMinChange = () => {},
   onHistoricoVotosChange = () => {},
 }) => {
+  const { token } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -213,9 +216,20 @@ const CandidatesTable = ({
   ]);
 
   const fetchCandidates = useCallback(async () => {
+    if (!estado || !token) {
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/candidatos`);
+      const response = await fetch(
+        `${API_V1_BASE_URL}/candidatos?estado=${encodeURIComponent(estado)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok) {
         throw new Error('Erro ao buscar candidatos');
       }
@@ -238,11 +252,11 @@ const CandidatesTable = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [estado, token]);
 
   useEffect(() => {
     fetchCandidates();
-  }, [fetchCandidates]);
+  }, [fetchCandidates, estado, token]);
 
   const fetchAutoComplete = useCallback(async (term, controller) => {
     if (term.length < AUTOCOMPLETE_MIN_CHARS) {
@@ -334,10 +348,11 @@ const CandidatesTable = ({
       const updatedCandidate = { ...candidate, status: newStatus };
       const payload = buildGridPayload(updatedCandidate);
 
-      const response = await fetch(`${API_BASE_URL}/candidato/${candidateId}`, {
+      const response = await fetch(`${API_V1_BASE_URL}/candidato/${candidateId}?estado=${encodeURIComponent(estado)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -413,10 +428,11 @@ const CandidatesTable = ({
         posicao_candidato: Number(newCandidate.posicao_candidato),
       };
 
-      const response = await fetch(`${API_BASE_URL}/candidato/cadastrar`, {
+      const response = await fetch(`${API_V1_BASE_URL}/candidato/cadastrar?estado=${encodeURIComponent(estado)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -509,10 +525,11 @@ const CandidatesTable = ({
 
     setIsSavingEdit(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/candidato/${editingCandidate.id}`, {
+      const response = await fetch(`${API_V1_BASE_URL}/candidato/${editingCandidate.id}?estado=${encodeURIComponent(estado)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(buildGridPayload(updatedCandidate)),
       });
@@ -553,10 +570,11 @@ const CandidatesTable = ({
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/candidato/${candidateId}`, {
+      const response = await fetch(`${API_V1_BASE_URL}/candidato/${candidateId}?estado=${encodeURIComponent(estado)}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -613,14 +631,15 @@ const CandidatesTable = ({
 
     const backendPayload = updatedCandidates.map((candidate) => ({
       id: candidate.id,
-      ...buildGridPayload(candidate),
+      posicao_candidato: candidate.posicao_candidato,
     }));
 
     try {
-      const response = await fetch(`${API_BASE_URL}/candidatos/update-order`, {
+      const response = await fetch(`${API_V1_BASE_URL}/candidatos/update-order?estado=${encodeURIComponent(estado)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(backendPayload),
       });

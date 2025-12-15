@@ -19,13 +19,12 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://147.79.81.117:3000",
-    "*",  # Liberado para todos temporariamente
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -58,4 +57,3 @@ def on_startup() -> None:
 
 
 app.include_router(api_router, prefix="/api/v1")
-app.include_router(candidato_grid.router, prefix="/api")

@@ -1,84 +1,31 @@
-import React, { useState } from 'react';
-import Sidebar from './components/Sidebar';
-import Header from './components/Header';
-import MetricsCards from './components/MetricsCards';
-import CandidatesTable from './components/CandidatesTable';
-import ProjectionCards from './components/ProjectionCards';
-// import LeadersSection from './components/LeadersSection';
-import LeadersTableFederal from './components/LeadersTableFederal';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
+import Dashboard from './components/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [femaleAffiliatedCount, setFemaleAffiliatedCount] = useState(0);
-  const [confirmedCount, setConfirmedCount] = useState(0);
-  const [negotiationCount, setNegotiationCount] = useState(0);
-  const [ppiCount, setPpiCount] = useState(0);
-  const [totalVotoProjMax, setTotalVotoProjMax] = useState(0);
-  const [totalVotoProjMin, setTotalVotoProjMin] = useState(0);
-  const [totalHistoricoVotos, setTotalHistoricoVotos] = useState(0);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
-
   return (
-    <div className="app">
-      <Header />
-      <div className="app-content-wrapper">
-        <button 
-          className="mobile-menu-toggle" 
-          onClick={toggleSidebar}
-          aria-label="Toggle menu"
-        >
-          ☰
-        </button>
-        
-        <div 
-          className={`mobile-overlay ${sidebarOpen ? 'show' : ''}`}
-          onClick={closeSidebar}
-        ></div>
-        
-        <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-        
-        <div className="main-content">
-        <MetricsCards
-          femaleAffiliatedCount={femaleAffiliatedCount}
-          confirmedCount={confirmedCount}
-          negotiationCount={negotiationCount}
-          ppiCount={ppiCount}
-        />
-        <CandidatesTable
-          onFemaleAffiliatedCountChange={setFemaleAffiliatedCount}
-          onConfirmedCountChange={setConfirmedCount}
-          onNegotiationCountChange={setNegotiationCount}
-          onPpiCountChange={setPpiCount}
-          onVotoProjMaxChange={setTotalVotoProjMax}
-          onVotoProjMinChange={setTotalVotoProjMin}
-          onHistoricoVotosChange={setTotalHistoricoVotos}
-        />
-        <div className="bottom-cards">
-          {/* <div className="left-card">
-            <LeadersSection />
-          </div> */}
-          <div className="center-card" style={{ gridColumn: 'span 2' }}>
-            <LeadersTableFederal />
-          </div>
-          <div className="right-card">
-            <ProjectionCards
-              totalVotoProjMax={totalVotoProjMax}
-              totalVotoProjMin={totalVotoProjMin}
-              totalHistoricoVotos={totalHistoricoVotos}
-            />
-          </div>
-        </div>
-        </div>
-      </div>
-    </div>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

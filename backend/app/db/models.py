@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, func
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, func, ForeignKey
 
 from .session import Base
 
@@ -10,6 +10,8 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     full_name = Column(String(255), nullable=True)
     hashed_password = Column(String(255), nullable=False)
+    perfil = Column(String(50), nullable=True)  # Coordenador ou Gestor
+    estados = Column(String(500), nullable=True)  # Lista de estados separados por vírgula (ex: "SP,RJ,RS")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
@@ -52,6 +54,8 @@ class CandidatoGrid(Base):
     raca = Column(String(100), nullable=True)
     status = Column(String(100), nullable=True, index=True)
     has_info = Column(Boolean, nullable=False, default=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    estado = Column(String(100), nullable=False, index=True)
 
 
 class FederaisNaoEleitosSP(Base):
