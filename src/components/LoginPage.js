@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import logoPodemos from '../assests/imagens/logo_podemos.svg';
+import logoPodemos from '../assests/imagens/logo_podemos_azul.svg';
 import './LoginPage.css';
 
 const LoginPage = () => {
