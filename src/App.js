@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
-import Dashboard from './components/Dashboard';
+import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -18,7 +18,7 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <Home />
               </ProtectedRoute>
             }
           />

@@ -6,11 +6,12 @@ import MetricsCards from './MetricsCards';
 import CandidatesTable from './CandidatesTable';
 import ProjectionCards from './ProjectionCards';
 import LeadersTableFederal from './LeadersTableFederal';
-import ConsolidatedView from './ConsolidatedView';
+import GestorPodemosBrasilView from './GestorPodemosBrasilView';
 
-const Dashboard = () => {
+const GestorDashboard = () => {
   const { selectedEstado, setSelectedEstado, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [femaleAffiliatedCount, setFemaleAffiliatedCount] = useState(0);
   const [confirmedCount, setConfirmedCount] = useState(0);
   const [negotiationCount, setNegotiationCount] = useState(0);
@@ -19,16 +20,15 @@ const Dashboard = () => {
   const [totalVotoProjMin, setTotalVotoProjMin] = useState(0);
   const [totalHistoricoVotos, setTotalHistoricoVotos] = useState(0);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
+  const toggleSidebar = () => setSidebarOpen((v) => !v);
+  const closeSidebar = () => setSidebarOpen(false);
 
   const handleEstadoSelect = (estado) => {
     setSelectedEstado(estado ?? null);
+  };
+
+  const handlePodemosBrasilSelect = () => {
+    setSelectedEstado(null);
   };
 
   return (
@@ -48,11 +48,20 @@ const Dashboard = () => {
           onClick={closeSidebar}
         ></div>
 
-        <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} onEstadoSelect={handleEstadoSelect} />
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={closeSidebar}
+          onEstadoSelect={handleEstadoSelect}
+          onPodemosBrasilSelect={handlePodemosBrasilSelect}
+          activeNav={selectedEstado == null ? 'podemos' : undefined}
+        />
 
         <div className="main-content">
           {selectedEstado == null ? (
-            <ConsolidatedView />
+            <GestorPodemosBrasilView
+              estados={user?.estados || []}
+              onSelectEstado={(estado) => setSelectedEstado(estado)}
+            />
           ) : (
             <>
               <MetricsCards
@@ -91,5 +100,6 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default GestorDashboard;
+
 

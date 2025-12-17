@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import logoSedip from '../assests/imagens/logo_sedip.svg';
 
-const Sidebar = ({ isOpen, onClose, onEstadoSelect }) => {
+const Sidebar = ({ isOpen, onClose, onEstadoSelect, onPodemosBrasilSelect, activeNav }) => {
   const [isEstaduaisOpen, setIsEstaduaisOpen] = useState(false);
   const { user, selectedEstado, setSelectedEstado } = useAuth();
 
@@ -46,15 +46,23 @@ const Sidebar = ({ isOpen, onClose, onEstadoSelect }) => {
                   Nenhum estado disponível
                 </div>
               ) : (
-                estadosPermitidos.map((estado, index) => (
+                <>
                   <button
-                    key={index}
-                    className={`submenu-item ${selectedEstado === estado ? 'active' : ''}`}
-                    onClick={() => handleEstadoClick(estado)}
+                    className={`submenu-item ${selectedEstado == null ? 'active' : ''}`}
+                    onClick={() => handleEstadoClick(null)}
                   >
-                    {estado}
+                    VISÃO GERAL
                   </button>
-                ))
+                  {estadosPermitidos.map((estado, index) => (
+                    <button
+                      key={index}
+                      className={`submenu-item ${selectedEstado === estado ? 'active' : ''}`}
+                      onClick={() => handleEstadoClick(estado)}
+                    >
+                      {estado}
+                    </button>
+                  ))}
+                </>
               )}
             </div>
           )}
@@ -65,7 +73,16 @@ const Sidebar = ({ isOpen, onClose, onEstadoSelect }) => {
           CANDIDATOS DEP. FEDERAIS
         </button>
         
-        <button className="nav-item" onClick={onClose}>
+        <button
+          className={`nav-item ${activeNav === 'podemos' ? 'active' : ''}`}
+          onClick={() => {
+            setSelectedEstado(null);
+            if (onPodemosBrasilSelect) {
+              onPodemosBrasilSelect();
+            }
+            onClose();
+          }}
+        >
           <span className="icon">🏛️</span>
           PODEMOS BRASIL
         </button>

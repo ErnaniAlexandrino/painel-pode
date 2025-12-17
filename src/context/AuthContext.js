@@ -54,16 +54,6 @@ export const AuthProvider = ({ children }) => {
       const userData = decodeToken(savedToken);
       if (userData) {
         setUser(userData);
-        // Selecionar o primeiro estado automaticamente se houver
-        if (userData.estados && userData.estados.length > 0) {
-          const savedEstado = localStorage.getItem('selectedEstado');
-          if (savedEstado && userData.estados.includes(savedEstado)) {
-            setSelectedEstado(savedEstado);
-          } else {
-            setSelectedEstado(userData.estados[0]);
-            localStorage.setItem('selectedEstado', userData.estados[0]);
-          }
-        }
       }
     }
     setLoading(false);
@@ -96,10 +86,6 @@ export const AuthProvider = ({ children }) => {
       const userData = decodeToken(accessToken);
       if (userData) {
         setUser(userData);
-        // Selecionar o primeiro estado automaticamente
-        if (userData.estados && userData.estados.length > 0) {
-          setSelectedEstado(userData.estados[0]);
-        }
       }
 
       return { success: true };
@@ -135,6 +121,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setSelectedEstado(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('selectedEstado');
   };
 
   const value = {
