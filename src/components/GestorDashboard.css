@@ -101,14 +101,20 @@
 .gestor-table {
   background: white;
   border-radius: 10px;
-  overflow: hidden;
   border: 1px solid #e5e7eb;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.gestor-table__scroll {
+  width: 100%;
+  max-height: 560px;
+  overflow-x: hidden; /* Sem scroll horizontal em telas grandes */
+  overflow-y: auto;   /* Scroll vertical aqui */
+}
+
 .gestor-table__header {
   display: grid;
-  grid-template-columns: 120px 70px 150px 170px 140px 120px 140px 140px 130px 190px;
+  grid-template-columns: 1.2fr 0.7fr 1.5fr 1.7fr 1.4fr 1.2fr 1.4fr 1.4fr 1.3fr 1.9fr;
   gap: 0;
   background: #a855f7;
   color: white;
@@ -119,13 +125,11 @@
 }
 
 .gestor-table__body {
-  max-height: 520px;
-  overflow: auto;
 }
 
 .gestor-table__row {
   display: grid;
-  grid-template-columns: 120px 70px 150px 170px 140px 120px 140px 140px 130px 190px;
+  grid-template-columns: 1.2fr 0.7fr 1.5fr 1.7fr 1.4fr 1.2fr 1.4fr 1.4fr 1.3fr 1.9fr;
   padding: 8px 12px;
   border-top: 1px solid #f3f4f6;
   font-size: 11px;
@@ -185,4 +189,14 @@
   transform: translateY(0);
 }
 
+@media (max-width: 1100px) {
+  .gestor-table__scroll {
+    overflow-x: auto; /* Ativa scroll horizontal em telas menores */
+  }
 
+  /* Contêiner interno com largura mínima fixa para manter header e body alinhados */
+  .gestor-table__header,
+  .gestor-table__body {
+    min-width: 1370px;
+  }
+}

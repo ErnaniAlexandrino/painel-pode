@@ -90,44 +90,46 @@ const GestorPodemosBrasilView = ({ estados = [], onSelectEstado }) => {
       </div>
 
       <div className="gestor-table">
-        <div className="gestor-table__header">
-          <div>ESTADO</div>
-          <div>CADEIRAS</div>
-          <div>VOTOS TOTAIS EM 2022</div>
-          <div>PROJEÇÃO DO COORDENADOR</div>
-          <div>FEFC MULHERES</div>
-          <div>FEFC PPI</div>
-          <div>FEFC DOTAÇÃO</div>
-          <div>FEFC SOLICITADO</div>
-          <div>FEFC SALDO</div>
-          <div />
-        </div>
+        <div className="gestor-table__scroll">
+          <div className="gestor-table__header">
+            <div>ESTADO</div>
+            <div>CADEIRAS</div>
+            <div>VOTOS TOTAIS EM 2022</div>
+            <div>PROJEÇÃO DO COORDENADOR</div>
+            <div>FEFC MULHERES</div>
+            <div>FEFC PPI</div>
+            <div>FEFC DOTAÇÃO</div>
+            <div>FEFC SOLICITADO</div>
+            <div>FEFC SALDO</div>
+            <div />
+          </div>
 
-        <div className="gestor-table__body">
-          {rows.map((row) => (
-            <div className="gestor-table__row" key={row.estado}>
-              <div className="gestor-td gestor-td--estado">{row.estado}</div>
-              <div className="gestor-td">{row.cadeiras}</div>
-              <div className="gestor-td">{row.votos2022}</div>
-              <div className="gestor-td">{row.projCoordenador}</div>
-              <div className="gestor-td">{row.fefcMulheres}</div>
-              <div className="gestor-td gestor-td--link">{row.fefcPpi}</div>
-              <div className="gestor-td">{row.fefcDotacao}</div>
-              <div className="gestor-td">{row.fefcSolicitado}</div>
-              <div className={`gestor-td ${row.saldoNegativo ? 'gestor-td--neg' : ''}`}>
-                {row.fefcSaldo}
+          <div className="gestor-table__body">
+            {rows.map((row) => (
+              <div className="gestor-table__row" key={row.estado}>
+                <div className="gestor-td gestor-td--estado">{row.estado}</div>
+                <div className="gestor-td">{row.cadeiras}</div>
+                <div className="gestor-td">{row.votos2022}</div>
+                <div className="gestor-td">{row.projCoordenador}</div>
+                <div className="gestor-td">{row.fefcMulheres}</div>
+                <div className="gestor-td gestor-td--link">{row.fefcPpi}</div>
+                <div className="gestor-td">{row.fefcDotacao}</div>
+                <div className="gestor-td">{row.fefcSolicitado}</div>
+                <div className={`gestor-td ${row.saldoNegativo ? 'gestor-td--neg' : ''}`}>
+                  {row.fefcSaldo}
+                </div>
+                <div className="gestor-td gestor-td--action">
+                  <button
+                    type="button"
+                    className="gestor-btn"
+                    onClick={() => onSelectEstado?.(row.estado)}
+                  >
+                    VISUALIZAR CANDIDATOS
+                  </button>
+                </div>
               </div>
-              <div className="gestor-td gestor-td--action">
-                <button
-                  type="button"
-                  className="gestor-btn"
-                  onClick={() => onSelectEstado?.(row.estado)}
-                >
-                  VISUALIZAR CANDIDATOS
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
