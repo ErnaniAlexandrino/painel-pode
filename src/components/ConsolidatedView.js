@@ -88,6 +88,9 @@ const ConsolidatedView = () => {
   const { user, token, setSelectedEstado } = useAuth();
   const estados = user?.estados || [];
 
+  // Verifica se o usuário é Gestor
+  const isGestor = (user?.perfil || '').toString().trim().toLowerCase() === 'gestor';
+
   // Alterna qual seção aparece primeiro, mantendo ambas visíveis (como na referência)
   const [order, setOrder] = useState('federalFirst'); // federalFirst | estadualFirst
   const [statsByEstado, setStatsByEstado] = useState({});
@@ -192,24 +195,26 @@ const ConsolidatedView = () => {
 
   return (
     <div className="consolidated">
-      <div className="consolidated__tabs">
-        <div className="consolidated__tabs-inner">
-          <button
-            type="button"
-            className={`consolidated__tab ${order === 'federalFirst' ? 'consolidated__tab--active' : ''}`}
-            onClick={() => setOrder('federalFirst')}
-          >
-            DEPUTADOS FEDERAIS
-          </button>
-          <button
-            type="button"
-            className={`consolidated__tab ${order === 'estadualFirst' ? 'consolidated__tab--active' : ''}`}
-            onClick={() => setOrder('estadualFirst')}
-          >
-            DEPUTADOS ESTADUAIS
-          </button>
+      {isGestor && (
+        <div className="consolidated__tabs">
+          <div className="consolidated__tabs-inner">
+            <button
+              type="button"
+              className={`consolidated__tab ${order === 'federalFirst' ? 'consolidated__tab--active' : ''}`}
+              onClick={() => setOrder('federalFirst')}
+            >
+              DEPUTADOS FEDERAIS
+            </button>
+            <button
+              type="button"
+              className={`consolidated__tab ${order === 'estadualFirst' ? 'consolidated__tab--active' : ''}`}
+              onClick={() => setOrder('estadualFirst')}
+            >
+              DEPUTADOS ESTADUAIS
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {hasError && (
         <div className="consolidated__error">

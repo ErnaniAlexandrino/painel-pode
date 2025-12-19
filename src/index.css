@@ -295,6 +295,16 @@ code {
   align-items: center;
 }
 
+/* Variante Coordenador */
+.header-bar--coordenador {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.user-info--coordenador {
+  color: #111827;
+}
+
 .user-avatar {
   width: 32px;
   height: 32px;
