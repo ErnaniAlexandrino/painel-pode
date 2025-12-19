@@ -386,10 +386,15 @@ const CandidatesTable = ({
 
     if (selectedSuggestion) {
       const candidate = mapSuggestionToCandidate(selectedSuggestion);
+      // Se o partido contém "PODE", definir status como "Filiado"
+      const status = candidate.partido?.toUpperCase().includes('PODE') 
+        ? 'Filiado' 
+        : candidate.status;
       setNewCandidate({
         ...candidate,
         historico_votos: candidate.historico_votos || '0',
         posicao_candidato: nextPosition,
+        status,
       });
     } else {
       setNewCandidate({
@@ -991,6 +996,7 @@ const CandidatesTable = ({
                                 value={displayCandidate.historico_votos ?? ''}
                                 onChange={(e) => handleEditChange('historico_votos', e.target.value)}
                                 className="edit-input"
+                                disabled
                               />
                             ) : (
                               candidate.historico_votos
@@ -1041,6 +1047,7 @@ const CandidatesTable = ({
                                 value={displayCandidate.fefc_historico ?? ''}
                                 onChange={(e) => handleEditChange('fefc_historico', e.target.value)}
                                 className="edit-input"
+                                disabled
                               />
                             ) : (
                               candidate.fefc_historico
