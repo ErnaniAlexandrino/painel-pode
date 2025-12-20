@@ -58,6 +58,30 @@ class CandidatoGrid(Base):
     estado = Column(String(100), nullable=False, index=True)
 
 
+class CandidatoFederalGrid(Base):
+    __tablename__ = "candidatos_federais_grid"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    posicao_candidato = Column(Integer, nullable=False, index=True)
+    vaga = Column(String(50), nullable=True)
+    nome_urna = Column(String(255), nullable=False, index=True)
+    voto_proj_max = Column(String(100), nullable=True)
+    voto_proj_min = Column(String(100), nullable=True)
+    historico_votos = Column(String(100), nullable=True)
+    cargo_disputado = Column(String(255), nullable=True)
+    ano = Column(String(10), nullable=True)
+    fefc_projetado = Column(String(255), nullable=True)
+    fefc_historico = Column(String(255), nullable=True)
+    reduto = Column(String(255), nullable=True)
+    partido = Column(String(100), nullable=True, index=True)
+    genero = Column(String(50), nullable=True, index=True)
+    raca = Column(String(100), nullable=True)
+    status = Column(String(100), nullable=True, index=True)
+    has_info = Column(Boolean, nullable=False, default=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    estado = Column(String(100), nullable=False, index=True)
+
+
 class FederaisNaoEleitosSP(Base):
     __tablename__ = "federais_nao_eleitos_sp"
 

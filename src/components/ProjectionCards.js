@@ -1,12 +1,11 @@
 import React from 'react';
+import { getElectoralData } from '../config/electoralData';
 
 // Função auxiliar para formatar números com separador de milhar
 const formatNumber = (num) => {
   if (num === null || num === undefined) return '0';
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
-
-const QUOCIENTE_ELETORAL = 352120;
 
 // Função para formatar número com 2 casas decimais (padrão brasileiro)
 const formatDecimal = (num) => {
@@ -18,11 +17,17 @@ const ProjectionCards = ({
   totalVotoProjMax = 0,
   totalVotoProjMin = 0,
   totalHistoricoVotos = 0,
+  tipoCargo = 'estadual',
+  estado = null,
 }) => {
-  const projecaoMaximaCadeiras = totalVotoProjMax / QUOCIENTE_ELETORAL;
-  const projecaoMinimaCadeiras = totalVotoProjMin / QUOCIENTE_ELETORAL;
+  // Busca o quociente eleitoral baseado no tipo de cargo e estado
+  const electoralData = getElectoralData(tipoCargo, estado);
+  const quocienteEleitoral = electoralData.quocienteEleitoral;
+  
+  const projecaoMaximaCadeiras = totalVotoProjMax / quocienteEleitoral;
+  const projecaoMinimaCadeiras = totalVotoProjMin / quocienteEleitoral;
   // Soma dos históricos multiplicada pelo quociente eleitoral (conforme solicitado)
-  const projecaoHistorico = totalHistoricoVotos / QUOCIENTE_ELETORAL;
+  const projecaoHistorico = totalHistoricoVotos / quocienteEleitoral;
   return (
     <div className="projection-cards">
       <div className="projection-card">

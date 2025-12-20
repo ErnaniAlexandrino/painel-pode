@@ -117,6 +117,7 @@ const PPI_RACES = new Set(['preta', 'parda', 'indígena']);
 
 const CandidatesTable = ({
   estado,
+  tipoCargo = 'estadual',
   onFemaleAffiliatedCountChange = () => {},
   onConfirmedCountChange = () => {},
   onNegotiationCountChange = () => {},
@@ -125,6 +126,25 @@ const CandidatesTable = ({
   onVotoProjMinChange = () => {},
   onHistoricoVotosChange = () => {},
 }) => {
+  // Função para obter endpoints baseados no tipo de cargo
+  const getEndpoints = (tipo) => {
+    if (tipo === 'federal') {
+      return {
+        list: 'candidatos-federais',
+        create: 'candidato-federal/cadastrar',
+        update: 'candidato-federal',
+        updateOrder: 'candidatos-federais/update-order',
+      };
+    }
+    return {
+      list: 'candidatos',
+      create: 'candidato/cadastrar',
+      update: 'candidato',
+      updateOrder: 'candidatos/update-order',
+    };
+  };
+
+  const endpoints = getEndpoints(tipoCargo);
   const { token } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -223,7 +243,7 @@ const CandidatesTable = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_V1_BASE_URL}/candidatos?estado=${encodeURIComponent(estado)}`,
+        `${API_V1_BASE_URL}/${endpoints.list}?estado=${encodeURIComponent(estado)}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -252,11 +272,11 @@ const CandidatesTable = ({
     } finally {
       setIsLoading(false);
     }
-  }, [estado, token]);
+  }, [estado, token, endpoints.list]);
 
   useEffect(() => {
     fetchCandidates();
-  }, [fetchCandidates, estado, token]);
+  }, [fetchCandidates, estado, token, tipoCargo]);
 
   const fetchAutoComplete = useCallback(async (term, controller) => {
     if (term.length < AUTOCOMPLETE_MIN_CHARS) {
@@ -348,7 +368,7 @@ const CandidatesTable = ({
       const updatedCandidate = { ...candidate, status: newStatus };
       const payload = buildGridPayload(updatedCandidate);
 
-      const response = await fetch(`${API_V1_BASE_URL}/candidato/${candidateId}?estado=${encodeURIComponent(estado)}`, {
+      const response = await fetch(`${API_V1_BASE_URL}/${endpoints.update}/${candidateId}?estado=${encodeURIComponent(estado)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -433,7 +453,7 @@ const CandidatesTable = ({
         posicao_candidato: Number(newCandidate.posicao_candidato),
       };
 
-      const response = await fetch(`${API_V1_BASE_URL}/candidato/cadastrar?estado=${encodeURIComponent(estado)}`, {
+      const response = await fetch(`${API_V1_BASE_URL}/${endpoints.create}?estado=${encodeURIComponent(estado)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -530,7 +550,7 @@ const CandidatesTable = ({
 
     setIsSavingEdit(true);
     try {
-      const response = await fetch(`${API_V1_BASE_URL}/candidato/${editingCandidate.id}?estado=${encodeURIComponent(estado)}`, {
+      const response = await fetch(`${API_V1_BASE_URL}/${endpoints.update}/${editingCandidate.id}?estado=${encodeURIComponent(estado)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -575,7 +595,7 @@ const CandidatesTable = ({
     }
 
     try {
-      const response = await fetch(`${API_V1_BASE_URL}/candidato/${candidateId}?estado=${encodeURIComponent(estado)}`, {
+      const response = await fetch(`${API_V1_BASE_URL}/${endpoints.update}/${candidateId}?estado=${encodeURIComponent(estado)}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -640,7 +660,7 @@ const CandidatesTable = ({
     }));
 
     try {
-      const response = await fetch(`${API_V1_BASE_URL}/candidatos/update-order?estado=${encodeURIComponent(estado)}`, {
+      const response = await fetch(`${API_V1_BASE_URL}/${endpoints.updateOrder}?estado=${encodeURIComponent(estado)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

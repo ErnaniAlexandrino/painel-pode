@@ -4,14 +4,26 @@ import logoSedip from '../assests/imagens/logo_sedip.svg';
 
 const Sidebar = ({ isOpen, onClose, onEstadoSelect, onPodemosBrasilSelect, activeNav }) => {
   const [isEstaduaisOpen, setIsEstaduaisOpen] = useState(false);
-  const { user, selectedEstado, setSelectedEstado } = useAuth();
+  const [isFederaisOpen, setIsFederaisOpen] = useState(false);
+  const { user, selectedEstado, setSelectedEstado, setTipoCargo } = useAuth();
 
   const toggleEstaduais = () => {
     setIsEstaduaisOpen(!isEstaduaisOpen);
+    if (!isEstaduaisOpen) {
+      setIsFederaisOpen(false);
+    }
   };
 
-  const handleEstadoClick = (estado) => {
+  const toggleFederais = () => {
+    setIsFederaisOpen(!isFederaisOpen);
+    if (!isFederaisOpen) {
+      setIsEstaduaisOpen(false);
+    }
+  };
+
+  const handleEstadoClick = (estado, tipoCargoValue) => {
     setSelectedEstado(estado);
+    setTipoCargo(tipoCargoValue || 'estadual');
     if (onEstadoSelect) {
       onEstadoSelect(estado);
     }
@@ -49,7 +61,7 @@ const Sidebar = ({ isOpen, onClose, onEstadoSelect, onPodemosBrasilSelect, activ
                 <>
                   <button
                     className={`submenu-item ${selectedEstado == null ? 'active' : ''}`}
-                    onClick={() => handleEstadoClick(null)}
+                    onClick={() => handleEstadoClick(null, 'estadual')}
                   >
                     VISÃO GERAL
                   </button>
@@ -57,7 +69,7 @@ const Sidebar = ({ isOpen, onClose, onEstadoSelect, onPodemosBrasilSelect, activ
                     <button
                       key={index}
                       className={`submenu-item ${selectedEstado === estado ? 'active' : ''}`}
-                      onClick={() => handleEstadoClick(estado)}
+                      onClick={() => handleEstadoClick(estado, 'estadual')}
                     >
                       {estado}
                     </button>
@@ -68,10 +80,40 @@ const Sidebar = ({ isOpen, onClose, onEstadoSelect, onPodemosBrasilSelect, activ
           )}
         </div>
         
-        <button className="nav-item" onClick={onClose}>
-          <span className="icon">👥</span>
-          CANDIDATOS DEP. FEDERAIS
-        </button>
+        <div className="nav-item-container">
+          <button className={`nav-item ${isFederaisOpen ? 'active' : ''}`} onClick={toggleFederais}>
+            <span className="icon">👥</span>
+            CANDIDATOS DEP. FEDERAIS
+            <span className="chevron">{isFederaisOpen ? '▼' : '▶'}</span>
+          </button>
+          {isFederaisOpen && (
+            <div className="submenu">
+              {estadosPermitidos.length === 0 ? (
+                <div className="submenu-item" style={{ cursor: 'default', opacity: 0.7 }}>
+                  Nenhum estado disponível
+                </div>
+              ) : (
+                <>
+                  <button
+                    className={`submenu-item ${selectedEstado == null ? 'active' : ''}`}
+                    onClick={() => handleEstadoClick(null, 'federal')}
+                  >
+                    VISÃO GERAL
+                  </button>
+                  {estadosPermitidos.map((estado, index) => (
+                    <button
+                      key={index}
+                      className={`submenu-item ${selectedEstado === estado ? 'active' : ''}`}
+                      onClick={() => handleEstadoClick(estado, 'federal')}
+                    >
+                      {estado}
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
+        </div>
         
         <button
           className={`nav-item ${activeNav === 'podemos' ? 'active' : ''}`}

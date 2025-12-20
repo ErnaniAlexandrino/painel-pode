@@ -9,7 +9,7 @@ import LeadersTableFederal from './LeadersTableFederal';
 import ConsolidatedView from './ConsolidatedView';
 
 const Dashboard = () => {
-  const { selectedEstado, setSelectedEstado, user } = useAuth();
+  const { selectedEstado, setSelectedEstado, user, tipoCargo } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [femaleAffiliatedCount, setFemaleAffiliatedCount] = useState(0);
   const [confirmedCount, setConfirmedCount] = useState(0);
@@ -60,9 +60,12 @@ const Dashboard = () => {
                 confirmedCount={confirmedCount}
                 negotiationCount={negotiationCount}
                 ppiCount={ppiCount}
+                tipoCargo={tipoCargo}
+                estado={selectedEstado}
               />
               <CandidatesTable
                 estado={selectedEstado}
+                tipoCargo={tipoCargo}
                 onFemaleAffiliatedCountChange={setFemaleAffiliatedCount}
                 onConfirmedCountChange={setConfirmedCount}
                 onNegotiationCountChange={setNegotiationCount}
@@ -80,6 +83,8 @@ const Dashboard = () => {
                     totalVotoProjMax={totalVotoProjMax}
                     totalVotoProjMin={totalVotoProjMin}
                     totalHistoricoVotos={totalHistoricoVotos}
+                    tipoCargo={tipoCargo}
+                    estado={selectedEstado}
                   />
                 </div>
               </div>

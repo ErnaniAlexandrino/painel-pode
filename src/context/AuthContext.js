@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
   const [selectedEstado, setSelectedEstado] = useState(null);
+  const [tipoCargo, setTipoCargo] = useState('estadual'); // 'estadual' ou 'federal'
 
   const decodeToken = (token) => {
     try {
@@ -120,6 +121,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     setSelectedEstado(null);
+    setTipoCargo('estadual');
     localStorage.removeItem('token');
     localStorage.removeItem('selectedEstado');
   };
@@ -134,6 +136,8 @@ export const AuthProvider = ({ children }) => {
     loading,
     selectedEstado,
     setSelectedEstado,
+    tipoCargo,
+    setTipoCargo,
     decodeToken,
   };
 

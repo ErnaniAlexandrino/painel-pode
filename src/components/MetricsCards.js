@@ -1,20 +1,38 @@
 import React from 'react';
-
-const FEMALE_QUOTA = 21;
+import { getElectoralData, formatQuociente } from '../config/electoralData';
 
 const MetricsCards = ({
   femaleAffiliatedCount = 0,
   confirmedCount = 0,
   negotiationCount = 0,
   ppiCount = 0,
+  tipoCargo = 'estadual',
+  estado = null,
 }) => {
-  const missingWomen = Math.max(FEMALE_QUOTA - femaleAffiliatedCount, 0);
+  // Busca os dados eleitorais baseado no tipo de cargo e estado
+  const electoralData = getElectoralData(tipoCargo, estado);
+  
+  const quocienteEleitoral = electoralData.quocienteEleitoral;
+  const clausulaBarreira = electoralData.clausulaBarreira;
+  const vagasTotais = electoralData.vagasTotais;
+  const vagasMulheres = electoralData.vagasMulheres;
+  
+  const missingWomen = Math.max(vagasMulheres - femaleAffiliatedCount, 0);
+  
+  // Calcula os percentuais do quociente eleitoral
+  const dezPorcentoQE = Math.floor(quocienteEleitoral * 0.1);
+  const vintePorcentoQE = Math.floor(quocienteEleitoral * 0.2);
+  const oitentaPorcentoQE = Math.floor(quocienteEleitoral * 0.8);
+  
+  // Determina o label do tipo de cargo
+  const tipoCargoLabel = tipoCargo === 'federal' ? 'Federal' : 'Estadual';
+  
   const voting2022Data = [
-    { label: 'Quociente Eleitoral para Dept. Federal', value: '352.120' }, 
-    { label: '10% do Q.E.', value: '35.212' },
-    { label: '20% do Q.E.', value: '70.424' }, 
-    { label: '80% do Q.E.', value: '281.696' },
-    { label: 'Cláusula de Barreira', value: '000.000' }
+    { label: `Quociente Eleitoral para Dept. ${tipoCargoLabel}`, value: formatQuociente(quocienteEleitoral) }, 
+    { label: '10% do Q.E.', value: formatQuociente(dezPorcentoQE) },
+    { label: '20% do Q.E.', value: formatQuociente(vintePorcentoQE) }, 
+    { label: '80% do Q.E.', value: formatQuociente(oitentaPorcentoQE) },
+    { label: 'Cláusula de Barreira', value: formatQuociente(clausulaBarreira) }
   ];
 
   const winningSlatesData = [
@@ -27,8 +45,8 @@ const MetricsCards = ({
   ];
 
   const electoralCompositionData = [
-    { label: 'Vagas Totais', value: '71' },
-    { label: 'Vagas para Mulheres', value: String(FEMALE_QUOTA) },
+    { label: 'Vagas Totais', value: String(vagasTotais) },
+    { label: 'Vagas para Mulheres', value: String(vagasMulheres) },
     { label: 'Candidatos Confirmados', value: String(confirmedCount) },
     { label: 'Candidatos em Negociação', value: String(negotiationCount) },
     {
