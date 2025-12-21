@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import StateCard from './StateCard';
+import { getElectoralData } from '../config/electoralData';
 import './ConsolidatedView.css';
 
 const API_V1_BASE_URL = process.env.REACT_APP_API_V1_BASE_URL || 'http://localhost:8000/api/v1';
-const QUOCIENTE_ELETORAL = 352120;
-const FEMALE_QUOTA = 21;
 
 const PPI_RACES = new Set(['preta', 'parda', 'indígena']);
 
@@ -41,10 +40,14 @@ const formatDecimalOrPlaceholder = (num) => {
   return n.toFixed(2).replace('.', ',');
 };
 
-const buildEstadualStats = (candidates) => {
+const buildStats = (candidates, tipoCargo, estado) => {
   const valid = (Array.isArray(candidates) ? candidates : []).filter(
     (c) => c && c.id !== 'placeholder' && c.id != null
   );
+
+  // Busca os dados eleitorais baseado no tipo de cargo e estado
+  const electoralData = getElectoralData(tipoCargo, estado);
+  const vagasMulheres = electoralData.vagasMulheres;
 
   let totalVotoProjMax = 0;
   let totalVotoProjMin = 0;
@@ -70,8 +73,8 @@ const buildEstadualStats = (candidates) => {
   });
 
   const totalCandidates = valid.length;
-  // Mesma regra usada em MetricsCards.js
-  const mulheresFaltando = Math.max(FEMALE_QUOTA - femaleAffiliatedCount, 0);
+  // Usa vagasMulheres da configuração em vez de constante hardcoded
+  const mulheresFaltando = Math.max(vagasMulheres - femaleAffiliatedCount, 0);
 
   return {
     totalCandidates,
@@ -93,7 +96,8 @@ const ConsolidatedView = () => {
 
   // Alterna qual seção aparece primeiro, mantendo ambas visíveis (como na referência)
   const [order, setOrder] = useState('federalFirst'); // federalFirst | estadualFirst
-  const [statsByEstado, setStatsByEstado] = useState({});
+  const [statsByEstadoEstadual, setStatsByEstadoEstadual] = useState({});
+  const [statsByEstadoFederal, setStatsByEstadoFederal] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -101,7 +105,8 @@ const ConsolidatedView = () => {
 
   useEffect(() => {
     if (!token || estados.length === 0) {
-      setStatsByEstado({});
+      setStatsByEstadoEstadual({});
+      setStatsByEstadoFederal({});
       return;
     }
 
@@ -111,22 +116,39 @@ const ConsolidatedView = () => {
       setHasError(false);
 
       try {
-        const results = await Promise.all(
+        // Buscar dados de candidatos estaduais
+        const resultsEstadual = await Promise.all(
           estados.map(async (estado) => {
             const response = await fetch(
               `${API_V1_BASE_URL}/candidatos?estado=${encodeURIComponent(estado)}`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
             if (!response.ok) {
-              throw new Error(`Erro ao buscar candidatos para ${estado}`);
+              throw new Error(`Erro ao buscar candidatos estaduais para ${estado}`);
             }
             const data = await response.json();
-            return [estado, buildEstadualStats(data)];
+            return [estado, buildStats(data, 'estadual', estado)];
+          })
+        );
+
+        // Buscar dados de candidatos federais
+        const resultsFederal = await Promise.all(
+          estados.map(async (estado) => {
+            const response = await fetch(
+              `${API_V1_BASE_URL}/candidatos-federais?estado=${encodeURIComponent(estado)}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (!response.ok) {
+              throw new Error(`Erro ao buscar candidatos federais para ${estado}`);
+            }
+            const data = await response.json();
+            return [estado, buildStats(data, 'federal', estado)];
           })
         );
 
         if (cancelled) return;
-        setStatsByEstado(Object.fromEntries(results));
+        setStatsByEstadoEstadual(Object.fromEntries(resultsEstadual));
+        setStatsByEstadoFederal(Object.fromEntries(resultsFederal));
       } catch (e) {
         if (!cancelled) {
           console.error(e);
@@ -146,49 +168,51 @@ const ConsolidatedView = () => {
   const sections = order === 'federalFirst' ? ['federal', 'estadual'] : ['estadual', 'federal'];
 
   const buildMetricsForTipo = (tipo, estado) => {
-    const stats = statsByEstado[estado];
+    // Seleciona os stats corretos baseado no tipo de cargo
+    const stats = tipo === 'federal' 
+      ? statsByEstadoFederal[estado] 
+      : statsByEstadoEstadual[estado];
 
-    // Federais: layout pronto; dados por estado ainda não existem na API atual
-    const isFederal = tipo === 'federal';
+    // Busca os dados eleitorais para obter o quociente eleitoral correto
+    const electoralData = getElectoralData(tipo, estado);
+    const quocienteEleitoral = electoralData.quocienteEleitoral;
 
     return [
       {
         key: 'cadeiras',
         label: 'Projeção de Cadeiras',
-        value: isFederal
-          ? '0,00'
-          : formatDecimalOrPlaceholder((stats?.totalVotoProjMax ?? 0) / QUOCIENTE_ELETORAL),
+        value: formatDecimalOrPlaceholder((stats?.totalVotoProjMax ?? 0) / quocienteEleitoral),
       },
       { key: 'percent', label: 'Percentual de Votos da Chapa', value: '000.000' },
       {
         key: 'vmax',
         label: 'Projeção de Votos Máxima',
-        value: isFederal ? '000.000' : formatNumberOrPlaceholder(stats?.totalVotoProjMax ?? 0),
+        value: formatNumberOrPlaceholder(stats?.totalVotoProjMax ?? 0),
       },
       {
         key: 'vmin',
         label: 'Projeção de Votos Mínimo',
-        value: isFederal ? '000.000' : formatNumberOrPlaceholder(stats?.totalVotoProjMin ?? 0),
+        value: formatNumberOrPlaceholder(stats?.totalVotoProjMin ?? 0),
       },
       {
         key: 'fefc_hist',
         label: 'FEFC pelo Histórico',
-        value: isFederal ? 'R$ 0' : formatCurrencyOrPlaceholder(stats?.totalFefcHistorico ?? 0),
+        value: formatCurrencyOrPlaceholder(stats?.totalFefcHistorico ?? 0),
       },
       {
         key: 'fefc_proj',
         label: 'FEFC Projetado',
-        value: isFederal ? 'R$ 0' : formatCurrencyOrPlaceholder(stats?.totalFefcProjetado ?? 0),
+        value: formatCurrencyOrPlaceholder(stats?.totalFefcProjetado ?? 0),
       },
       {
         key: 'mulheres',
         label: 'Vagas de Mulheres Faltando',
-        value: isFederal ? '000.000' : formatNumberOrPlaceholder(stats?.mulheresFaltando ?? 0),
+        value: formatNumberOrPlaceholder(stats?.mulheresFaltando ?? 0),
       },
       {
         key: 'ppi',
         label: 'Candidatos Declarados PPI',
-        value: isFederal ? '000.000' : formatNumberOrPlaceholder(stats?.ppiCount ?? 0),
+        value: formatNumberOrPlaceholder(stats?.ppiCount ?? 0),
       },
     ];
   };
@@ -203,14 +227,14 @@ const ConsolidatedView = () => {
               className={`consolidated__tab ${order === 'federalFirst' ? 'consolidated__tab--active' : ''}`}
               onClick={() => setOrder('federalFirst')}
             >
-              DEPUTADOS FEDERAIS
+              DEPUTADOS ESTADUAIS
             </button>
             <button
               type="button"
               className={`consolidated__tab ${order === 'estadualFirst' ? 'consolidated__tab--active' : ''}`}
               onClick={() => setOrder('estadualFirst')}
             >
-              DEPUTADOS ESTADUAIS
+              DEPUTADOS FEDERAIS
             </button>
           </div>
         </div>

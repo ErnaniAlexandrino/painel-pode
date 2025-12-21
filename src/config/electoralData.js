@@ -23,14 +23,14 @@ export const ELECTORAL_DATA = {
   estadual: {
     // Valores padrão para Deputado Estadual
     default: {
-      quocienteEleitoral: 854010,
+      quocienteEleitoral: 240827,
       clausulaBarreira: 0,
       vagasTotais: 94,
       vagasMulheres: 28,
     },
     // Valores específicos por estado para Deputado Estadual
     SP: {
-      quocienteEleitoral: 854010,
+      quocienteEleitoral: 240827,
       clausulaBarreira: 0,
       vagasTotais: 94,
       vagasMulheres: 28,
