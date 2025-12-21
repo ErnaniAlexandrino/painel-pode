@@ -88,7 +88,7 @@ const buildStats = (candidates, tipoCargo, estado) => {
 };
 
 const ConsolidatedView = () => {
-  const { user, token, setSelectedEstado } = useAuth();
+  const { user, token, setSelectedEstado, setTipoCargo } = useAuth();
   const estados = user?.estados || [];
 
   // Verifica se o usuário é Gestor
@@ -261,7 +261,10 @@ const ConsolidatedView = () => {
                   variant={variant}
                   subtitle={subtitle}
                   metrics={buildMetricsForTipo(tipo, estado)}
-                  onViewCandidates={() => setSelectedEstado(estado)}
+                  onViewCandidates={() => {
+                    setTipoCargo(tipo);
+                    setSelectedEstado(estado);
+                  }}
                 />
               ))}
             </div>
