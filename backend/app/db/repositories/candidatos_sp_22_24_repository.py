@@ -21,7 +21,7 @@ class CandidatosSP2224Repository:
         query = self.db.query(CandidatosSP2224)
         
         # Condições fixas: ordem = 1 e fundo_partidario is not null
-        query = query.filter(CandidatosSP2224.ordem == 1)
+        # query = query.filter(CandidatosSP2224.ordem == 1)
         query = query.filter(CandidatosSP2224.fundo_partidario.isnot(None))
 
         if nome:
@@ -40,7 +40,7 @@ class CandidatosSP2224Repository:
             query = query.filter(CandidatosSP2224.resultado_agregado.ilike(f"%{resultado_agregado}%"))
 
         return (
-            query.order_by(CandidatosSP2224.votos.desc())
+            query.order_by(CandidatosSP2224.ano.desc())
             .limit(max(limit, 1))
             .all()
         )

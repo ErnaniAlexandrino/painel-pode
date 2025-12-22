@@ -40,7 +40,7 @@ const MetricsCards = ({
     { party: 'União Brasil', votes: '10.215.433', seats: '59', fefc: 'R$ 782.463.805,10' },
     { party: 'Republicanos', votes: '6.977.525', seats: '40', fefc: 'R$ 242.164.884,93' },
     { party: 'PT', votes: '13.236.634', seats: '68', fefc: 'R$ 499.584.091,73' },
-    { party: 'PL', votes: '18.220.301', seats: '19', fefc: 'R$ 288.517.369,67' },
+    { party: 'PL', votes: '18.220.301', seats: '99', fefc: 'R$ 288.517.369,67' },
     { party: 'PSDB', votes: '3.309.061', seats: '13', fefc: 'R$ 320.003.589,74' }
   ];
 
