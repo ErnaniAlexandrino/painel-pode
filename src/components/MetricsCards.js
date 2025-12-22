@@ -36,12 +36,12 @@ const MetricsCards = ({
   ];
 
   const winningSlatesData = [
-    { party: 'Progressistas', votes: '000.000', seats: '3', fefc: 'R$ 1.203.000' },
-    { party: 'União Brasil', votes: '000.000', seats: '2', fefc: 'R$ 800.000' },
-    { party: 'Republicanos', votes: '000.000', seats: '2', fefc: 'R$ 750.000' },
-    { party: 'PT', votes: '000.000', seats: '1', fefc: 'R$ 600.000' },
-    { party: 'PL', votes: '000.000', seats: '1', fefc: 'R$ 550.000' },
-    { party: 'PSDB', votes: '000.000', seats: '1', fefc: 'R$ 500.000' }
+    { party: 'Progressistas', votes: '8.692.918', seats: '47', fefc: 'R$ 344.757.042,30' },
+    { party: 'União Brasil', votes: '10.215.433', seats: '59', fefc: 'R$ 782.463.805,10' },
+    { party: 'Republicanos', votes: '6.977.525', seats: '40', fefc: 'R$ 242.164.884,93' },
+    { party: 'PT', votes: '13.236.634', seats: '68', fefc: 'R$ 499.584.091,73' },
+    { party: 'PL', votes: '18.220.301', seats: '19', fefc: 'R$ 288.517.369,67' },
+    { party: 'PSDB', votes: '3.309.061', seats: '13', fefc: 'R$ 320.003.589,74' }
   ];
 
   const electoralCompositionData = [

@@ -69,20 +69,20 @@ const mapSuggestionToCandidate = (suggestion) => {
 
   return {
     ...createEmptyCandidate(),
-    nome_urna: data.candidato ?? suggestion.nome ?? '',
+    nome_urna: data.nome_urna ?? suggestion.nome ?? '',
     historico_votos:
-      data.historico_de_votos !== null && data.historico_de_votos !== undefined
-        ? String(data.historico_de_votos)
+      data.votos !== null && data.votos !== undefined
+        ? String(data.votos)
         : '0',
     cargo_disputado: data.cargo ?? suggestion.cargo ?? '',
     ano: data.ano !== null && data.ano !== undefined ? String(data.ano) : '',
     fefc_historico:
-      data.historico_de_fefc !== null && data.historico_de_fefc !== undefined
-        ? String(data.historico_de_fefc)
+      data.fundo_total !== null && data.fundo_total !== undefined
+        ? String(data.fundo_total)
         : '',
     partido: data.partido ?? suggestion.partido ?? '',
     genero: data.genero ?? '',
-    raca: normalizeRace(data.raca_cor) || normalizeRace(suggestion.raca),
+    raca: normalizeRace(data.raca) || normalizeRace(suggestion.raca),
   };
 };
 
@@ -287,11 +287,11 @@ const CandidatesTable = ({
     setIsAutoCompleteLoading(true);
     try {
       const params = new URLSearchParams({
-        nome_candidato: term,
+        nome: term,
         limit: String(AUTOCOMPLETE_LIMIT),
       });
       const response = await fetch(
-        `${API_V1_BASE_URL}/candidatos2022sp?${params.toString()}`,
+        `${API_V1_BASE_URL}/candidatos-sp-22-24?${params.toString()}`,
         { signal: controller?.signal }
       );
       if (!response.ok) {
@@ -305,7 +305,7 @@ const CandidatesTable = ({
       const data = await response.json();
       const suggestions = (Array.isArray(data) ? data : []).map((item) => ({
         id: item.id,
-        nome: item.candidato,
+        nome: item.nome_urna,
         partido: item.partido,
         cargo: item.cargo,
         raw: item,
