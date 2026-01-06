@@ -25,7 +25,7 @@ class CandidatosSP2224Repository:
         query = query.filter(CandidatosSP2224.fundo_partidario.isnot(None))
 
         if nome:
-            query = query.filter(CandidatosSP2224.nome.ilike(f"%{nome}%"))
+            query = query.filter(CandidatosSP2224.nome_urna.ilike(f"%{nome}%"))
 
         if partido:
             query = query.filter(CandidatosSP2224.partido.ilike(f"%{partido}%"))

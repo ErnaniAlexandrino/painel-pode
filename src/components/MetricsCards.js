@@ -36,12 +36,22 @@ const MetricsCards = ({
   ];
 
   const winningSlatesData = [
-    { party: 'Progressistas', votes: '8.692.918', seats: '47', fefc: 'R$ 344.757.042,30' },
-    { party: 'União Brasil', votes: '10.215.433', seats: '59', fefc: 'R$ 782.463.805,10' },
-    { party: 'Republicanos', votes: '6.977.525', seats: '40', fefc: 'R$ 242.164.884,93' },
-    { party: 'PT', votes: '13.236.634', seats: '68', fefc: 'R$ 499.584.091,73' },
-    { party: 'PL', votes: '18.220.301', seats: '99', fefc: 'R$ 288.517.369,67' },
-    { party: 'PSDB', votes: '3.309.061', seats: '13', fefc: 'R$ 320.003.589,74' }
+    { party: 'PL', votes: '5.343.667', seats: '17', fefc: 'R$ 31.906.618,92' },
+    { party: 'PT', votes: '2.941.086', seats: '11', fefc: 'R$ 43.914.150,98' },
+    { party: 'PSOL', votes: '1.984.281', seats: '5', fefc: 'R$ 15.238.933,74' },
+    { party: 'UNIÃO', votes: '1.811.462', seats: '6', fefc: 'R$ 69.313.058,63' },
+    { party: 'REPUBLICANO', votes: '1.580.891', seats: '5', fefc: 'R$ 31.592.353,94' },
+    // { party: 'MDB', votes: '1.533.541', seats: '5', fefc: 'R$ 26.549.529,06' },
+    // { party: 'PP', votes: '1.174.646', seats: '4', fefc: 'R$ 16.134.627,17' },
+    // { party: 'PSDB', votes: '1.061.538', seats: '3', fefc: 'R$ 29.889.206,01' },
+    // { party: 'PSD', votes: '1.055.965', seats: '3', fefc: 'R$ 18.786.764,71' },
+    { party: 'PODEMOS', votes: '892.443', seats: '3', fefc: 'R$ 23.056.233,86' }
+    // { party: 'PSB', votes: '732.045', seats: '2', fefc: 'R$ 15.438.413,29' },
+    // { party: 'CIDADANIA', votes: '438.574', seats: '2', fefc: 'R$ 10.281.341,82' },
+    // { party: 'SOLIDARIEDADE', votes: '379.310', seats: '1', fefc: 'R$ 14.882.189,41' },
+    // { party: 'NOVO', votes: '361.268', seats: '1', fefc: 'R$ -' },
+    // { party: 'REDE', votes: '304.580', seats: '1', fefc: 'R$ 4.923.826,87' },
+    // { party: 'PSC', votes: '293.192', seats: '1', fefc: 'R$ 3.645.008,56' }
   ];
 
   const electoralCompositionData = [
