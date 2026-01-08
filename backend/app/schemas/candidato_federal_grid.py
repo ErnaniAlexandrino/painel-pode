@@ -54,3 +54,4 @@ class CandidatoFederalGridUpdate(BaseModel):
 class CandidatoFederalGridUpdateOrder(BaseModel):
     id: int
     posicao_candidato: int
+

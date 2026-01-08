@@ -19,6 +19,14 @@ const LeadersTableFederal = () => {
   const [originalData, setOriginalData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filterOptions, setFilterOptions] = useState({
+    ano: [],
+    cargo: [],
+    partido: [],
+    genero: [],
+    raca: [],
+    resultado_agregado: [],
+  });
   const [filters, setFilters] = useState({
     party: '',
     genero: '',
@@ -28,10 +36,20 @@ const LeadersTableFederal = () => {
     resultado_agregado: '',
   });
 
-  // Extrai valores únicos de uma coluna para popular os dropdowns
-  const getUniqueValues = (column) => {
-    const values = originalData.map((item) => item[column]);
-    return [...new Set(values)].filter((v) => v && v !== '-').sort();
+  // Usa as opções de filtro do backend
+  const getFilterOptions = (column) => {
+    // Mapeia os nomes das colunas do frontend para os nomes do backend
+    const columnMap = {
+      'party': 'partido',
+      'genero': 'genero',
+      'raca': 'raca',
+      'ano': 'ano',
+      'cargo': 'cargo',
+      'resultado_agregado': 'resultado_agregado',
+    };
+    
+    const backendColumn = columnMap[column] || column;
+    return filterOptions[backendColumn] || [];
   };
 
   // Verifica se há algum filtro ativo
@@ -39,65 +57,35 @@ const LeadersTableFederal = () => {
     return Object.values(filters).some((value) => value !== '');
   }, [filters]);
 
-  // Aplica os filtros aos dados
-  const applyFilters = useCallback(() => {
-    let filtered = [...originalData];
-
-    if (filters.party) {
-      filtered = filtered.filter((item) => item.party === filters.party);
-    }
-    if (filters.genero) {
-      filtered = filtered.filter((item) => item.genero === filters.genero);
-    }
-    if (filters.raca) {
-      filtered = filtered.filter((item) => item.raca === filters.raca);
-    }
-    if (filters.ano) {
-      filtered = filtered.filter((item) => item.ano === filters.ano);
-    }
-    if (filters.cargo) {
-      filtered = filtered.filter((item) => item.cargo === filters.cargo);
-    }
-    if (filters.resultado_agregado) {
-      filtered = filtered.filter((item) => item.resultado_agregado === filters.resultado_agregado);
-    }
-
-    setLeadersData(filtered);
-  }, [filters, originalData]);
-
-  // Limpa todos os filtros
-  const clearFilters = () => {
-    setFilters({
-      party: '',
-      genero: '',
-      raca: '',
-      ano: '',
-      cargo: '',
-      resultado_agregado: '',
-    });
-  };
-
-  // Atualiza um filtro específico
-  const handleFilterChange = (column, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [column]: value,
-    }));
-  };
-
-  // Aplica filtros quando os filtros mudam
-  useEffect(() => {
-    if (originalData.length > 0) {
-      applyFilters();
-    }
-  }, [applyFilters, originalData]);
-
-  const fetchCandidatosSP2224 = async () => {
+  // Busca dados do backend com os filtros aplicados
+  const fetchDataWithFilters = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_V1_BASE_URL}/candidatos-sp-22-24?limit=500`);
+      const params = new URLSearchParams();
+      params.append('limit', '500');
+      
+      if (filters.party) {
+        params.append('partido', filters.party);
+      }
+      if (filters.genero) {
+        params.append('genero', filters.genero);
+      }
+      if (filters.ano) {
+        params.append('ano', filters.ano);
+      }
+      if (filters.resultado_agregado) {
+        params.append('resultado_agregado', filters.resultado_agregado);
+      }
+      if (filters.cargo) {
+        params.append('cargo', filters.cargo);
+      }
+      if (filters.raca) {
+        params.append('raca', filters.raca);
+      }
+      
+      const response = await fetch(`${API_V1_BASE_URL}/candidatos-sp-22-24?${params.toString()}`);
       
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados: ${response.status}`);
@@ -122,21 +110,62 @@ const LeadersTableFederal = () => {
       setOriginalData(mappedData);
       setLeadersData(mappedData);
     } catch (err) {
-      console.error('Erro ao buscar candidatos SP 22/24:', err);
+      console.error('Erro ao buscar candidatos SP:', err);
       setError('Erro ao carregar dados. Tente novamente mais tarde.');
     } finally {
       setLoading(false);
     }
+  }, [filters]);
+
+  // Limpa todos os filtros
+  const clearFilters = () => {
+    setFilters({
+      party: '',
+      genero: '',
+      raca: '',
+      ano: '',
+      cargo: '',
+      resultado_agregado: '',
+    });
+  };
+
+  // Atualiza um filtro específico
+  const handleFilterChange = (column, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [column]: value,
+    }));
+  };
+
+  // Busca dados quando os filtros mudam
+  useEffect(() => {
+    fetchDataWithFilters();
+  }, [fetchDataWithFilters]);
+
+  const fetchFilterOptions = async () => {
+    try {
+      const response = await fetch(`${API_V1_BASE_URL}/candidatos-sp-22-24/filter-options`);
+      
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar opções de filtro: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setFilterOptions(data);
+    } catch (err) {
+      console.error('Erro ao buscar opções de filtro:', err);
+      // Não interrompe o carregamento se falhar, apenas loga o erro
+    }
   };
 
   useEffect(() => {
-    fetchCandidatosSP2224();
+    fetchFilterOptions();
   }, []);
 
   return (
     <div className="leaders-table">
       <div className="card-header purple">
-        <span>CANDIDATOS SP - 2022 / 2024</span>
+        <span>CANDIDATOS SP - 2020 / 2022 / 2024</span>
         {hasActiveFilters && (
           <button className="clear-filters-btn" onClick={clearFilters}>
             Limpar Filtros
@@ -177,7 +206,7 @@ const LeadersTableFederal = () => {
                     onChange={(e) => handleFilterChange('party', e.target.value)}
                   >
                     <option value="">Todos</option>
-                    {getUniqueValues('party').map((value) => (
+                    {getFilterOptions('party').map((value) => (
                       <option key={value} value={value}>
                         {value}
                       </option>
@@ -193,7 +222,7 @@ const LeadersTableFederal = () => {
                     onChange={(e) => handleFilterChange('cargo', e.target.value)}
                   >
                     <option value="">Todos</option>
-                    {getUniqueValues('cargo').map((value) => (
+                    {getFilterOptions('cargo').map((value) => (
                       <option key={value} value={value}>
                         {value}
                       </option>
@@ -207,7 +236,7 @@ const LeadersTableFederal = () => {
                     onChange={(e) => handleFilterChange('genero', e.target.value)}
                   >
                     <option value="">Todos</option>
-                    {getUniqueValues('genero').map((value) => (
+                    {getFilterOptions('genero').map((value) => (
                       <option key={value} value={value}>
                         {value}
                       </option>
@@ -221,7 +250,7 @@ const LeadersTableFederal = () => {
                     onChange={(e) => handleFilterChange('raca', e.target.value)}
                   >
                     <option value="">Todos</option>
-                    {getUniqueValues('raca').map((value) => (
+                    {getFilterOptions('raca').map((value) => (
                       <option key={value} value={value}>
                         {value}
                       </option>
@@ -235,7 +264,7 @@ const LeadersTableFederal = () => {
                     onChange={(e) => handleFilterChange('ano', e.target.value)}
                   >
                     <option value="">Todos</option>
-                    {getUniqueValues('ano').map((value) => (
+                    {getFilterOptions('ano').map((value) => (
                       <option key={value} value={value}>
                         {value}
                       </option>
@@ -249,7 +278,7 @@ const LeadersTableFederal = () => {
                     onChange={(e) => handleFilterChange('resultado_agregado', e.target.value)}
                   >
                     <option value="">Todos</option>
-                    {getUniqueValues('resultado_agregado').map((value) => (
+                    {getFilterOptions('resultado_agregado').map((value) => (
                       <option key={value} value={value}>
                         {value}
                       </option>

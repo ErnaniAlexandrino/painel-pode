@@ -34,12 +34,24 @@ def listar_candidatos_sp_22_24(
     ano: Optional[int] = Query(
         None,
         alias="ano",
-        description="Filtro opcional pelo ano da eleição (2022 ou 2024)",
+        description="Filtro opcional pelo ano da eleição (2020, 2022 ou 2024)",
     ),
     resultado_agregado: Optional[str] = Query(
         None,
         alias="resultado_agregado",
         description="Filtro opcional pelo resultado agregado (eleito, não eleito)",
+        min_length=1,
+    ),
+    cargo: Optional[str] = Query(
+        None,
+        alias="cargo",
+        description="Filtro opcional pelo cargo",
+        min_length=1,
+    ),
+    raca: Optional[str] = Query(
+        None,
+        alias="raca",
+        description="Filtro opcional pela raça",
         min_length=1,
     ),
     limit: int = Query(
@@ -50,7 +62,7 @@ def listar_candidatos_sp_22_24(
     ),
 ) -> List[CandidatosSP2224Read]:
     """
-    Lista os candidatos de SP das eleições de 2022 e 2024.
+    Lista os candidatos de SP das eleições de 2020, 2022 e 2024.
     """
     service = CandidatosSP2224Service(db)
     return service.list_candidatos(
@@ -59,6 +71,8 @@ def listar_candidatos_sp_22_24(
         genero=genero,
         ano=ano,
         resultado_agregado=resultado_agregado,
+        cargo=cargo,
+        raca=raca,
         limit=limit,
     )
 
@@ -79,6 +93,21 @@ def contar_candidatos_sp_22_24(
 
 
 @router.get(
+    "/candidatos-sp-22-24/filter-options",
+    status_code=status.HTTP_200_OK,
+)
+def obter_opcoes_filtro(
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Retorna todas as opções de filtro disponíveis na base de dados.
+    Inclui valores distintos de: ano, cargo, partido, genero, raca, resultado_agregado.
+    """
+    service = CandidatosSP2224Service(db)
+    return service.get_filter_options()
+
+
+@router.get(
     "/candidatos-sp-22-24/{registro_id}",
     response_model=CandidatosSP2224Read,
     status_code=status.HTTP_200_OK,
@@ -95,4 +124,3 @@ def obter_candidato_sp_22_24(
         return service.get_candidato(registro_id)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-

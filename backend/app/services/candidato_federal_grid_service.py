@@ -62,3 +62,4 @@ class CandidatoFederalGridService:
         if not candidato:
             raise ValueError("Candidato não encontrado.")
         self.repository.delete(candidato_id, user_id=user_id, estado=estado)
+

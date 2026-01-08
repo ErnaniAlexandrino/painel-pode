@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict, List
 
 from sqlalchemy.orm import Session
 
@@ -16,6 +16,8 @@ class CandidatosSP2224Repository:
         genero: Optional[str] = None,
         ano: Optional[int] = None,
         resultado_agregado: Optional[str] = None,
+        cargo: Optional[str] = None,
+        raca: Optional[str] = None,
         limit: int = 100,
     ):
         query = self.db.query(CandidatosSP2224)
@@ -37,7 +39,13 @@ class CandidatosSP2224Repository:
             query = query.filter(CandidatosSP2224.ano == ano)
 
         if resultado_agregado:
-            query = query.filter(CandidatosSP2224.resultado_agregado.ilike(f"%{resultado_agregado}%"))
+            query = query.filter(CandidatosSP2224.resultado_agregado == resultado_agregado)
+
+        if cargo:
+            query = query.filter(CandidatosSP2224.cargo.ilike(f"%{cargo}%"))
+
+        if raca:
+            query = query.filter(CandidatosSP2224.raca.ilike(f"%{raca}%"))
 
         return (
             query.order_by(CandidatosSP2224.ano.desc())
@@ -54,4 +62,77 @@ class CandidatosSP2224Repository:
 
     def count_all(self):
         return self.db.query(CandidatosSP2224).count()
+
+    def get_filter_options(self) -> Dict[str, List]:
+        """
+        Retorna valores distintos de cada campo de filtro diretamente da base de dados.
+        Aplica o mesmo filtro de fundo_partidario IS NOT NULL para consistência.
+        """
+        base_query = self.db.query(CandidatosSP2224).filter(
+            CandidatosSP2224.fundo_partidario.isnot(None)
+        )
+        
+        # Obter valores distintos de cada campo
+        anos = [
+            str(ano[0]) for ano in 
+            base_query.with_entities(CandidatosSP2224.ano)
+            .filter(CandidatosSP2224.ano.isnot(None))
+            .distinct()
+            .order_by(CandidatosSP2224.ano)
+            .all()
+        ]
+        
+        cargos = [
+            cargo[0] for cargo in
+            base_query.with_entities(CandidatosSP2224.cargo)
+            .filter(CandidatosSP2224.cargo.isnot(None))
+            .distinct()
+            .order_by(CandidatosSP2224.cargo)
+            .all()
+        ]
+        
+        partidos = [
+            partido[0] for partido in
+            base_query.with_entities(CandidatosSP2224.partido)
+            .filter(CandidatosSP2224.partido.isnot(None))
+            .distinct()
+            .order_by(CandidatosSP2224.partido)
+            .all()
+        ]
+        
+        generos = [
+            genero[0] for genero in
+            base_query.with_entities(CandidatosSP2224.genero)
+            .filter(CandidatosSP2224.genero.isnot(None))
+            .distinct()
+            .order_by(CandidatosSP2224.genero)
+            .all()
+        ]
+        
+        racas = [
+            raca[0] for raca in
+            base_query.with_entities(CandidatosSP2224.raca)
+            .filter(CandidatosSP2224.raca.isnot(None))
+            .distinct()
+            .order_by(CandidatosSP2224.raca)
+            .all()
+        ]
+        
+        resultados = [
+            resultado[0] for resultado in
+            base_query.with_entities(CandidatosSP2224.resultado_agregado)
+            .filter(CandidatosSP2224.resultado_agregado.isnot(None))
+            .distinct()
+            .order_by(CandidatosSP2224.resultado_agregado)
+            .all()
+        ]
+        
+        return {
+            "ano": anos,
+            "cargo": cargos,
+            "partido": partidos,
+            "genero": generos,
+            "raca": racas,
+            "resultado_agregado": resultados,
+        }
 

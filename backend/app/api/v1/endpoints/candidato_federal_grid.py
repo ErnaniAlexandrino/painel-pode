@@ -152,3 +152,4 @@ def deletar_candidato_federal(
         return {"message": "Candidato excluído com sucesso"}
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+

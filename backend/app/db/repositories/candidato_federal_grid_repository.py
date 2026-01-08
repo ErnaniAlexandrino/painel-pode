@@ -103,3 +103,4 @@ class CandidatoFederalGridRepository:
                 )
             
             self.db.commit()
+

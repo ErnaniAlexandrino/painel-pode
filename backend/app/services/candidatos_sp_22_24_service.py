@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -17,6 +17,8 @@ class CandidatosSP2224Service:
         genero: Optional[str] = None,
         ano: Optional[int] = None,
         resultado_agregado: Optional[str] = None,
+        cargo: Optional[str] = None,
+        raca: Optional[str] = None,
         limit: int = 100,
     ) -> List[CandidatosSP2224Read]:
         registros = self.repository.list_all(
@@ -25,6 +27,8 @@ class CandidatosSP2224Service:
             genero=genero,
             ano=ano,
             resultado_agregado=resultado_agregado,
+            cargo=cargo,
+            raca=raca,
             limit=limit,
         )
         return [CandidatosSP2224Read.model_validate(registro) for registro in registros]
@@ -37,4 +41,10 @@ class CandidatosSP2224Service:
 
     def count_all(self) -> int:
         return self.repository.count_all()
+
+    def get_filter_options(self) -> Dict[str, List]:
+        """
+        Retorna todas as opções de filtro disponíveis na base de dados.
+        """
+        return self.repository.get_filter_options()
 

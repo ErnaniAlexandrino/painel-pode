@@ -7,14 +7,14 @@ export const ELECTORAL_DATA = {
     default: {
       quocienteEleitoral: 352120,
       clausulaBarreira: 0,
-      vagasTotais: 70,
+      vagasTotais: 71,
       vagasMulheres: 21,
     },
     // Valores específicos por estado para Deputado Federal
     SP: {
       quocienteEleitoral: 352120,
       clausulaBarreira: 0,
-      vagasTotais: 70,
+      vagasTotais: 71,
       vagasMulheres: 21,
     },
     // Adicione outros estados conforme necessário
