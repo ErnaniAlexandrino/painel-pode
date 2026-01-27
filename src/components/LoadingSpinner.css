@@ -1,0 +1,41 @@
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-spinner-svg {
+  width: 100%;
+  height: 100%;
+  /* Rotação suave do conjunto completo */
+  animation: rotate-flower 4s linear infinite;
+}
+
+.loading-petal {
+  transform-origin: 250px 250px;
+  transform: rotate(var(--rotation));
+  /* Efeito de "nascendo" com pulsação e delay */
+  animation: petal-pulse 1.5s infinite ease-in-out;
+  animation-delay: var(--delay);
+  opacity: 0.8;
+}
+
+@keyframes rotate-flower {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes petal-pulse {
+  0%, 100% {
+    transform: rotate(var(--rotation)) scale(0.6);
+    opacity: 0.4;
+  }
+  50% {
+    transform: rotate(var(--rotation)) scale(1.1);
+    opacity: 1;
+  }
+}
